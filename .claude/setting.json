@@ -1,0 +1,20 @@
+{
+	"permissions": {
+		"allow": ["Bash(bun test *)", "Bash(bun run *)"],
+		"deny": ["Bash(rm -rf *)"]
+	},
+	"hooks": {
+		"PostToolUse": [
+			{
+				"matcher": "Edit|Write",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "echo '🛠️ {{tool_output}}' | biome check --write {{file_path}}"
+					}
+				]
+			}
+		]
+	},
+	"outputStyle": "Learning"
+}
