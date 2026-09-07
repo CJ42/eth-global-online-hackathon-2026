@@ -14,14 +14,20 @@ import {
 } from "viem";
 import { robinhood } from "viem/chains";
 
-import { TOKEN_WHALE, TOKENS } from "@/constants";
+import {
+	type AvailableWhaleTokens,
+	TOKEN_ADDRESS_BY_SYMBOL,
+	TOKEN_WHALE,
+	TOKENIZED_STOCKS,
+	TOKENS,
+} from "@/constants"
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
 export async function distributeInitialTokens(
-	tokenSymbol: "USDG" | "WETH",
+	tokenSymbol: AvailableWhaleTokens,
 	recipient: `0x${string}`,
 	amount: bigint,
 ) {
@@ -44,18 +50,8 @@ export async function distributeInitialTokens(
 		transport: http("http://127.0.0.1:8545"),
 	});
 
-	let tokenWhale: `0x${string}`, tokenAddress: `0x${string}`;
-
-	switch (tokenSymbol) {
-		case "USDG":
-			tokenWhale = TOKEN_WHALE.USDG;
-			tokenAddress = TOKENS.USDG;
-			break;
-		case "WETH":
-			tokenWhale = TOKEN_WHALE.WETH;
-			tokenAddress = TOKENS.WETH;
-			break;
-	}
+	const tokenWhale = TOKEN_WHALE[tokenSymbol]
+	const tokenAddress = TOKEN_ADDRESS_BY_SYMBOL[tokenSymbol]
 
 	try {
 		console.log(
@@ -104,7 +100,7 @@ export async function logTokenBalances(label: string, maker: Address) {
 		transport: http("http://127.0.0.1:8545"),
 	});
 
-	const [usdgBalance, wethBalance] = await Promise.all([
+	const [usdgBalance, wethBalance, oneinchBalance, tslaBalance] = await Promise.all([
 		publicClient.readContract({
 			address: TOKENS.USDG,
 			abi: erc20Abi,
@@ -117,8 +113,22 @@ export async function logTokenBalances(label: string, maker: Address) {
 			functionName: "balanceOf",
 			args: [maker],
 		}),
+		publicClient.readContract({
+			address: TOKENS.ONEINCH,
+			abi: erc20Abi,
+			functionName: "balanceOf",
+			args: [maker],
+		}),
+		publicClient.readContract({
+			address: TOKENIZED_STOCKS.TSLA,
+			abi: erc20Abi,
+			functionName: "balanceOf",
+			args: [maker],
+		}),
 	]);
 
 	console.log(`${label} USDG: ${formatUnits(usdgBalance, 6)}`);
 	console.log(`${label} WETH: ${formatEther(wethBalance)}`);
+	console.log(`${label} 1INCH: ${formatUnits(oneinchBalance, 18)}`);
+	console.log(`${label} WETH: ${formatUnits(tslaBalance, 18)}`);
 }

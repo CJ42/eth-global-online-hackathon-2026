@@ -21,6 +21,30 @@ Building an Aqua App with Swap VM opcodes for portfolio management, balancing li
 | Medium risk  | WETH / 1INCH       | 30%          | 50%      | 30%        |
 | High risk | USDG / one stock   | 20%          | 25%      | 50%        |
 
+## Example
+
+A user (= liquidity provider) has 1,000$ to invest.
+
+The user picks one of the following profile (Conservative, Balanced, or Aggressive). 
+
+Depending on the profile selected, the aqua strategies will be shipped differently with different amounts.
+
+Let's consider the user picks **Conservative**
+
+1. Approve USDG + WETH + stock to Aqua.
+2. ship three strategies with virtual balances ≈ $500 / $300 / $200.
+3. The dashboard shows those 3 strategyHashes.
+
+```
+Maker wallet                    Aqua registry                 SwapVM router
+(tokens live here)              (virtual balances)            (AMM program)
+      │                                │                            │
+      │  approve USDG + WETH           │                            │
+      │───────────────────────────────►│                            │
+      │  ship(app, strategy, amounts)  │                            │
+      │───────────────────────────────►│  “app = this router”       │
+      │                                │───────────────────────────►│
+```
 
 ## References
 

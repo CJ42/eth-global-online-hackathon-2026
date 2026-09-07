@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "chain:start": "anvil --fork-url https://rpc.mainnet.chain.robinhood.com",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
