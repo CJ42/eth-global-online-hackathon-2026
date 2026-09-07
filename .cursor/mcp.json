@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"1inch-business": {
+			"url": "https://api.1inch.com/mcp/protocol",
+			"headers": {}
+		}
+	}
+}

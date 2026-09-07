@@ -19,3 +19,34 @@ bun start
 ```
 
 This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+
+# TODO List
+
+- [ ] Make the dashboard that allows to enter the amount in $$$ and it will then allow you to select among the three different strategies
+
+What you actually build
+A profile LP manager for one wallet.
+
+User picks Conservative / Balanced / Aggressive. You ship three Aqua strategies you own:
+
+Sleeve	Pair (Robinhood)	Conservative	Balanced	Aggressive
+Low risk
+USDG / WETH
+50%
+25%
+20%
+Mid risk
+WETH / 1INCH
+30%
+50%
+30%
+High risk
+USDG / one stock
+20%
+25%
+50%
+Example: user has $1000 and picks Conservative.
+
+Approve USDG + WETH + stock to Aqua.
+ship three strategies with virtual balances ≈ $500 / $300 / $200.
+Dashboard shows those 3 strategyHashes.

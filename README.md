@@ -14,6 +14,16 @@ Building an Aqua App with Swap VM opcodes for portfolio management, balancing li
 | Balanced     | 25%                           | 50%                       | 25%                              |
 | Aggressive   | 20%                           | 30%                       | 50%                              |
 
+Let's imagine to start there are 3 pools:
+
+- **Low-Risk**: USDC, EURC (Stable coins, low risk) -> we will use the pool USDC / EURC
+- **Medium-Risk**: ETH, wBTC -> we will use the pool ETH / LINK
+- **High Risk**: PEPE, LINK
+
+We will use the Ethereum network.
+
+Or we could use the 1inch Aqua API on Robinhood to trade tokenized stocks.
+
 ## References
 
 - https://github.com/1inch/swap-vm/blob/main/docs/PROGRAMS.md

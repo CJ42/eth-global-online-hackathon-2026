@@ -5,6 +5,7 @@ node_modules
 out
 dist
 *.tgz
+robinhood-strategies.json
 
 # code coverage
 coverage

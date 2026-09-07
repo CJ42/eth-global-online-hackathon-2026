@@ -1,4 +1,9 @@
 {
-	"wake.compiler.solc.remappings": [],
+	"wake.compiler.solc.remappings": [
+		"@1inch/=node_modules/@1inch/",
+		"@openzeppelin/=node_modules/@openzeppelin/",
+		"hardhat-deploy/=node_modules/hardhat-deploy/",
+		"hardhat/=node_modules/hardhat/"
+	],
 	"editor.tabSize": 2
 }
