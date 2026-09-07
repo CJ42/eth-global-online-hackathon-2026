@@ -41,8 +41,6 @@ export const TOKENS: Record<AvailableTokens, Address> = {
 	ONEINCH: "0x1755c2910c126ee1b0cf1e08a307dc9e787285a0",
 } as const;
 
-
-
 // Token whales holding large amounts of tokens
 // used for distributing tokens to maker / liquidity provider
 // ----------------------------------------
@@ -52,11 +50,11 @@ export const TOKEN_WHALE = {
 	WETH: "0xA379bedcc2A237cab1021cc2A4744edfB6C42618",
 	ONEINCH: "0x481787bBa8C56f801Db8bdb336844b771c011246",
 	TSLA: "0x2F4579Ca81717d3D61BF8b6f06571877Bbe54A07",
-} as const satisfies Record<string, Address>
+} as const satisfies Record<string, Address>;
 
-export type AvailableWhaleTokens = keyof typeof TOKEN_WHALE
+export type AvailableWhaleTokens = keyof typeof TOKEN_WHALE;
 
 export const TOKEN_ADDRESS_BY_SYMBOL = {
 	...TOKENS,
 	...TOKENIZED_STOCKS,
-} as const
+} as const;

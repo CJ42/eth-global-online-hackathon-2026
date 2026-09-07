@@ -16,10 +16,10 @@ Building an Aqua App with Swap VM opcodes for portfolio management, balancing li
 - **Aggressive**
 
 | Sleeve    | Pair (Robinhood)   | Conservative | Balanced | Aggressive |
-|-----------|--------------------|--------------|----------|------------|
+|-----------|----------------------------|--------------|----------|------------|
 | Low risk  | USDG / WETH        | 50%          | 25%      | 20%        |
 | Medium risk  | WETH / 1INCH       | 30%          | 50%      | 30%        |
-| High risk | USDG / one stock   | 20%          | 25%      | 50%        |
+| High risk | USDG / one stock (e.g: TSLA) | 20%          | 25%      | 50%        |
 
 ## Example
 

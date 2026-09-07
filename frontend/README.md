@@ -23,3 +23,5 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 # TODO List
 
 - [ ] Make the dashboard that allows to enter the amount in $$$ and it will then allow you to select among the three different strategies
+
+- [ ] Implement rebalancing using `dock` -> then `ship`

@@ -1,29 +1,29 @@
 .main {
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  padding: 2rem 1.5rem;
+	min-height: 100svh;
+	display: grid;
+	place-items: center;
+	padding: 2rem 1.5rem;
 }
 
 .stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  width: min(100%, 36rem);
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	width: min(100%, 36rem);
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+	font-size: 2rem;
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	line-height: 1.15;
 }
 
 .subtitle {
-  color: var(--muted-foreground);
+	color: var(--muted-foreground);
 }
 
 .actions {
-  display: flex;
-  gap: 0.75rem;
+	display: flex;
+	gap: 0.75rem;
 }

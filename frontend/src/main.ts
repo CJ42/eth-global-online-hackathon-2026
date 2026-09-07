@@ -1,5 +1,3 @@
-import { Address } from "@1inch/aqua-sdk";
-
 import {
 	createTestClient,
 	http,
@@ -11,15 +9,19 @@ import {
 import { robinhood } from "viem/chains";
 
 import { maker, wallet } from "@/config";
-import { TOKENS } from "@/constants";
 import { distributeInitialTokens, logTokenBalances } from "@/lib/utils";
-import { buildAquaStrategy, type LiquidityProvision } from "./lib/strategy";
-import { approveAquaToSpendTokens } from "./lib/tokens";
+import {
+	buildPortfolioAllocations,
+	FIXED_TOKEN_PRICES_USD,
+	PROFILE_WEIGHTS,
+} from "./lib/portfolio";
+import { shipAquaPortfolio } from "./lib/strategy";
 
 // The user (= liquidity provider) will place 1,000$.
 // It will pick "Conservative", it is going to ship as follow:
 // - 50% = 500$ in USDG / WETH, so 250$ in USDG, 250$ in WETH
-// - 30% = 300$ in
+// - 30% = 300$ in WETH / 1INCH, so 150$ in WETH, 150$ in 1INCH
+// - 20% = 200$ in USDG / TSLA, so 100$ in USDG, 100$ in TSLA
 
 // Note: for simplicity for now, we assume assume the following fix conversion rates:
 // - 1 ETH 		= 2,500.00$
@@ -38,42 +40,34 @@ async function main() {
 	// + connect to anvil fork running for Robinhood
 	const testClient = createTestClient({
 		chain: robinhood,
-		mode: "anvil", // Or 'hardhat' depending on your node
+		mode: "anvil",
 		transport: http("http://127.0.0.1:8545"),
 	})
 		.extend(publicActions)
 		.extend(walletActions);
 
-	// (Optional) Fund with ETH to pay for transaction gas fees
+		await testClient.setBalance({ address: maker, value: parseEther("1") })
 	await testClient.impersonateAccount({ address: maker });
 
-	// 3. approve Aqua contract to spend tokens
-	const usdgAmount = parseUnits("250", 6);
-	const wethAmount = parseEther("0.1");
+	// 3. calculate Conservative portfolio allocations from fixed prices
+	const { allocations, approvals } = buildPortfolioAllocations({
+		totalUsd: 1000,
+		weights: PROFILE_WEIGHTS.conservative,
+		prices: FIXED_TOKEN_PRICES_USD,
+	});
 
-	await approveAquaToSpendTokens(TOKENS.USDG, usdgAmount);
-	await approveAquaToSpendTokens(TOKENS.WETH, wethAmount);
+	console.log("📦 Portfolio allocations:", allocations);
+	console.log("✅ Aggregate approvals:", approvals);
 
-	// 4. build strategy to ship
-	const liquidityProvision: LiquidityProvision = [
-		{
-			token: new Address(TOKENS.USDG),
-			amount: usdgAmount, // USDG has 6 decimals
-		},
-		{
-			token: new Address(TOKENS.WETH),
-			amount: wethAmount,
-		},
-	];
+	// 4. approve once per token and ship all three Aqua strategies
+	const result = await shipAquaPortfolio({
+		maker,
+		walletClient: wallet,
+		allocations,
+		approvals,
+	});
 
-	const shipTx = buildAquaStrategy(liquidityProvision);
-
-	console.log("💧 Aqua Ship tx: ", shipTx);
-
-	// final: send the transaction
-	// TODO: try to run it with `testClient` instead?
-	const result = await wallet.sendTransaction(shipTx);
-	console.log("Result: ", result);
+	console.log("💧 Aqua portfolio shipped:", result);
 }
 
 main().catch((err) => console.error(err));

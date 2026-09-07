@@ -1,18 +1,31 @@
 import {
-  wallet,
-  AQUA_CONTRACT
-} from "@/config";
+	type Account,
+	type Address,
+	erc20Abi,
+	type Hex,
+	type WalletClient,
+} from "viem";
+import { AQUA_CONTRACT } from "@/config";
 
-import { erc20Abi } from "viem"
+const aquaContractAddress = AQUA_CONTRACT.toString() as Address;
 
-const aquaContractAddress = AQUA_CONTRACT.toString() as `0x${string}`;
-
-export async function approveAquaToSpendTokens(token: `0x${string}`, amount: bigint) {
-  await wallet.writeContract({
-    address: token,
-	  abi: erc20Abi,
-	  functionName: "approve",
-	  args: [aquaContractAddress, amount],
-	  account: wallet.account.address,
-  })
+export async function approveAquaToSpendTokens({
+	walletClient,
+	account,
+	token,
+	amount,
+}: {
+	walletClient: WalletClient;
+	account: Account | Address;
+	token: Address;
+	amount: bigint;
+}): Promise<Hex> {
+	return walletClient.writeContract({
+		address: token,
+		abi: erc20Abi,
+		functionName: "approve",
+		args: [aquaContractAddress, amount],
+		account,
+		chain: walletClient.chain,
+	});
 }

@@ -20,7 +20,7 @@ import {
 	TOKEN_WHALE,
 	TOKENIZED_STOCKS,
 	TOKENS,
-} from "@/constants"
+} from "@/constants";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -50,8 +50,8 @@ export async function distributeInitialTokens(
 		transport: http("http://127.0.0.1:8545"),
 	});
 
-	const tokenWhale = TOKEN_WHALE[tokenSymbol]
-	const tokenAddress = TOKEN_ADDRESS_BY_SYMBOL[tokenSymbol]
+	const tokenWhale = TOKEN_WHALE[tokenSymbol];
+	const tokenAddress = TOKEN_ADDRESS_BY_SYMBOL[tokenSymbol];
 
 	try {
 		console.log(
@@ -100,32 +100,33 @@ export async function logTokenBalances(label: string, maker: Address) {
 		transport: http("http://127.0.0.1:8545"),
 	});
 
-	const [usdgBalance, wethBalance, oneinchBalance, tslaBalance] = await Promise.all([
-		publicClient.readContract({
-			address: TOKENS.USDG,
-			abi: erc20Abi,
-			functionName: "balanceOf",
-			args: [maker],
-		}),
-		publicClient.readContract({
-			address: TOKENS.WETH,
-			abi: erc20Abi,
-			functionName: "balanceOf",
-			args: [maker],
-		}),
-		publicClient.readContract({
-			address: TOKENS.ONEINCH,
-			abi: erc20Abi,
-			functionName: "balanceOf",
-			args: [maker],
-		}),
-		publicClient.readContract({
-			address: TOKENIZED_STOCKS.TSLA,
-			abi: erc20Abi,
-			functionName: "balanceOf",
-			args: [maker],
-		}),
-	]);
+	const [usdgBalance, wethBalance, oneinchBalance, tslaBalance] =
+		await Promise.all([
+			publicClient.readContract({
+				address: TOKENS.USDG,
+				abi: erc20Abi,
+				functionName: "balanceOf",
+				args: [maker],
+			}),
+			publicClient.readContract({
+				address: TOKENS.WETH,
+				abi: erc20Abi,
+				functionName: "balanceOf",
+				args: [maker],
+			}),
+			publicClient.readContract({
+				address: TOKENS.ONEINCH,
+				abi: erc20Abi,
+				functionName: "balanceOf",
+				args: [maker],
+			}),
+			publicClient.readContract({
+				address: TOKENIZED_STOCKS.TSLA,
+				abi: erc20Abi,
+				functionName: "balanceOf",
+				args: [maker],
+			}),
+		]);
 
 	console.log(`${label} USDG: ${formatUnits(usdgBalance, 6)}`);
 	console.log(`${label} WETH: ${formatEther(wethBalance)}`);
