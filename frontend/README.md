@@ -50,3 +50,14 @@ Example: user has $1000 and picks Conservative.
 Approve USDG + WETH + stock to Aqua.
 ship three strategies with virtual balances ≈ $500 / $300 / $200.
 Dashboard shows those 3 strategyHashes.
+
+```
+Maker wallet                    Aqua registry                 SwapVM router
+(tokens live here)              (virtual balances)            (AMM program)
+      │                                │                            │
+      │  approve USDG + WETH           │                            │
+      │───────────────────────────────►│                            │
+      │  ship(app, strategy, amounts)  │                            │
+      │───────────────────────────────►│  “app = this router”       │
+      │                                │───────────────────────────►│
+```

@@ -1,24 +1,37 @@
 import {
+	Address,
+	AQUA_CONTRACT_ADDRESSES,
+	AquaProtocolContract,
+	HexString,
+	NetworkEnum,
+} from "@1inch/aqua-sdk";
+import {
+	AQUA_SWAP_VM_CONTRACT_ADDRESSES,
+	AquaXYCAmmStrategy,
+	MakerTraits,
+	Order,
+} from "@1inch/swap-vm-sdk";
+
+import {
+	createPublicClient,
 	createTestClient,
 	createWalletClient,
 	encodeAbiParameters,
+	erc20Abi,
+	formatEther,
+	formatUnits,
+	getAddress,
 	http,
 	parseEther,
 	parseUnits,
+	publicActions,
+	walletActions,
 } from "viem";
 import { privateKeyToAccount, privateKeyToAddress } from "viem/accounts";
 import { robinhood } from "viem/chains";
 
-import {
-	AquaProtocolContract,
-	AQUA_CONTRACT_ADDRESSES,
-	NetworkEnum,
-	Address,
-	HexString,
-} from "@1inch/aqua-sdk";
-import { AQUA_SWAP_VM_CONTRACT_ADDRESSES } from "@1inch/swap-vm-sdk";
-
-import { WETH_TOKEN, USDG_TOKEN } from "@/constants";
+import { TOKENS } from "@/constants";
+import { distributeInitialTokens, logTokenBalances } from "@/lib/utils";
 
 const aquaContractAddress = AQUA_CONTRACT_ADDRESSES[NetworkEnum.ROBINHOOD];
 const aquaRegistry = new AquaProtocolContract(aquaContractAddress);
@@ -30,66 +43,78 @@ const swapVmRouter = AQUA_SWAP_VM_CONTRACT_ADDRESSES[NetworkEnum.ROBINHOOD];
 
 // Note: we assume for now a fixed rate of 1 ETH = 2,500$
 
-// TODO: replace by `process.env.MAKER_PRIVATE_KEY`
-const makerPrivateKey =
-	"0xcafecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe";
-const maker = privateKeyToAddress(makerPrivateKey);
+// Impersonate this random address for now
+const maker = "0x74fabbd2e02557dD31c1f7AEf193f95197C5c32C";
 
-// Define strategy based on the smart contract app structure. Each Aqua app can have it's own strategy schema
-const strategyData = {
-	maker,
-	token0: WETH_TOKEN,
-	token1: USDG_TOKEN,
-	feeBps: 0n,
-	salt: "0x0000000000000000000000000000000000000000000000000000000000000001",
-} as const;
+const usdgAmount = parseUnits("250", 6);
+const wethAmount = parseEther("0.1");
 
-// Encode strategy as bytes
-const strategy = encodeAbiParameters(
-	[
-		{
-			name: "strategy",
-			type: "tuple",
-			components: [
-				{ name: "maker", type: "address" },
-				{ name: "token0", type: "address" },
-				{ name: "token1", type: "address" },
-				{ name: "feeBps", type: "uint256" },
-				{ name: "salt", type: "bytes32" },
-			],
-		},
-	],
-	[strategyData],
-);
+// await logTokenBalances("before", maker);
+await distributeInitialTokens("USDG", maker, usdgAmount);
+await distributeInitialTokens("WETH", maker, wethAmount);
+await logTokenBalances("after", maker);
+
+const program = AquaXYCAmmStrategy.new().withFeeTokenIn(30).build();
+const order = Order.new({
+	maker: new Address(maker),
+	program,
+	traits: MakerTraits.default(),
+});
 
 // Ship your first strategy
 const shipTx = aquaRegistry.ship({
 	app: swapVmRouter,
-	strategy: new HexString(strategy),
+	strategy: order.encode(),
 	amountsAndTokens: [
 		{
-			token: new Address(USDG_TOKEN),
-			amount: parseUnits("250", 6), // USDG has 6 decimals
+			token: new Address(TOKENS.USDG),
+			amount: usdgAmount, // USDG has 6 decimals
 		},
 		{
-			token: new Address(WETH_TOKEN),
-			amount: parseEther("0.1"),
+			token: new Address(TOKENS.WETH),
+			amount: wethAmount,
 		},
 	],
 });
+
+console.log("Ship tx: ", shipTx);
 
 // connect to anvil fork running for Robinhood
 const testClient = createTestClient({
 	chain: robinhood,
 	mode: "anvil", // Or 'hardhat' depending on your node
 	transport: http("http://127.0.0.1:8545"),
-});
+})
+	.extend(publicActions)
+	.extend(walletActions);
+
+// (Optional) Fund with ETH to pay for transaction gas fees
+await testClient.impersonateAccount({ address: maker });
 
 // Send transaction
 const wallet = createWalletClient({
 	chain: robinhood,
 	transport: http("http://127.0.0.1:8545"),
-	account: privateKeyToAccount(makerPrivateKey),
+	account: maker,
 });
 
-await wallet.sendTransaction(shipTx);
+const aqua = aquaContractAddress.toString() as `0x${string}`;
+
+await wallet.writeContract({
+	address: TOKENS.USDG,
+	abi: erc20Abi,
+	functionName: "approve",
+	args: [aqua, usdgAmount],
+	account: maker,
+});
+await wallet.writeContract({
+	address: TOKENS.WETH,
+	abi: erc20Abi,
+	functionName: "approve",
+	args: [aqua, wethAmount],
+	account: maker,
+});
+
+// TODO: try to run it with `testClient` instead?
+const result = await wallet.sendTransaction(shipTx);
+console.log("Result: ", result);

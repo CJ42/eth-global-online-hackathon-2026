@@ -2,33 +2,28 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import {
-	erc20Abi,
+	type Address,
+	createPublicClient,
 	createTestClient,
+	createWalletClient,
+	erc20Abi,
+	formatEther,
+	formatUnits,
 	http,
 	parseEther,
-	createWalletClient,
-	createPublicClient,
 } from "viem";
 import { robinhood } from "viem/chains";
 
-import { WETH_TOKEN, USDG_TOKEN } from "@/constants";
+import { TOKEN_WHALE, TOKENS } from "@/constants";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-// Token whales for distributing tokens
-// ----------------------------------------
-const TOKEN_WHALE: Record<"USDG" | "WETH", `0x${string}`> = {
-	// holds around 13 Millions USDG
-	USDG: "0x1A18a8b96eac3F980133A18402d04194f1FAA4E7",
-	WETH: "0xA379bedcc2A237cab1021cc2A4744edfB6C42618",
-};
-
-async function distributeInitialTokens(
+export async function distributeInitialTokens(
 	tokenSymbol: "USDG" | "WETH",
 	recipient: `0x${string}`,
-	amount: any,
+	amount: bigint,
 ) {
 	// connect to anvil fork running for Robinhood
 	const testClient = createTestClient({
@@ -54,11 +49,11 @@ async function distributeInitialTokens(
 	switch (tokenSymbol) {
 		case "USDG":
 			tokenWhale = TOKEN_WHALE.USDG;
-			tokenAddress = USDG_TOKEN;
+			tokenAddress = TOKENS.USDG;
 			break;
 		case "WETH":
 			tokenWhale = TOKEN_WHALE.WETH;
-			tokenAddress = WETH_TOKEN;
+			tokenAddress = TOKENS.WETH;
 			break;
 	}
 
@@ -101,4 +96,29 @@ async function distributeInitialTokens(
 	} catch (error) {
 		console.error("Error distributing tokens:", error);
 	}
+}
+
+export async function logTokenBalances(label: string, maker: Address) {
+	const publicClient = createPublicClient({
+		chain: robinhood,
+		transport: http("http://127.0.0.1:8545"),
+	});
+
+	const [usdgBalance, wethBalance] = await Promise.all([
+		publicClient.readContract({
+			address: TOKENS.USDG,
+			abi: erc20Abi,
+			functionName: "balanceOf",
+			args: [maker],
+		}),
+		publicClient.readContract({
+			address: TOKENS.WETH,
+			abi: erc20Abi,
+			functionName: "balanceOf",
+			args: [maker],
+		}),
+	]);
+
+	console.log(`${label} USDG: ${formatUnits(usdgBalance, 6)}`);
+	console.log(`${label} WETH: ${formatEther(wethBalance)}`);
 }

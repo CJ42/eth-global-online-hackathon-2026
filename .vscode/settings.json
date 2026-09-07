@@ -5,5 +5,11 @@
 		"hardhat-deploy/=node_modules/hardhat-deploy/",
 		"hardhat/=node_modules/hardhat/"
 	],
-	"editor.tabSize": 2
+	"editor.tabSize": 2,
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports.biome": "explicit",
+		"source.fixAll.biome": "explicit"
+	}
 }
