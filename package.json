@@ -12,7 +12,7 @@
   },
   "workspaces": [
     "contracts/*",
-    "frontend/*"
+    "frontend"
   ],
   "dependencies": {
     "@1inch/solidity-utils": "6.9.7",

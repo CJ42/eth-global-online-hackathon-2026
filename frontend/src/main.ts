@@ -2,7 +2,6 @@ import {
 	Address,
 	AQUA_CONTRACT_ADDRESSES,
 	AquaProtocolContract,
-	HexString,
 	NetworkEnum,
 } from "@1inch/aqua-sdk";
 import {
@@ -13,21 +12,15 @@ import {
 } from "@1inch/swap-vm-sdk";
 
 import {
-	createPublicClient,
 	createTestClient,
 	createWalletClient,
-	encodeAbiParameters,
 	erc20Abi,
-	formatEther,
-	formatUnits,
-	getAddress,
 	http,
 	parseEther,
 	parseUnits,
 	publicActions,
 	walletActions,
 } from "viem";
-import { privateKeyToAccount, privateKeyToAddress } from "viem/accounts";
 import { robinhood } from "viem/chains";
 
 import { TOKENS } from "@/constants";
@@ -40,6 +33,7 @@ const swapVmRouter = AQUA_SWAP_VM_CONTRACT_ADDRESSES[NetworkEnum.ROBINHOOD];
 // The user (= liquidity provider) will place 1,000$.
 // It will pick "Conservative", it is going to ship as follow:
 // - 50% = 500$ in USDG / WETH, so 250$ in USDG, 250$ in WETH
+// - 30% = 300$ in
 
 // Note: we assume for now a fixed rate of 1 ETH = 2,500$
 

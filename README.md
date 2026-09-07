@@ -4,25 +4,23 @@
 
 Building an Aqua App with Swap VM opcodes for portfolio management, balancing liquidity between different portfolio management strategies. Funds are rebalanced automatically between liquidity pools for the liquidity provider.
 
+**Stack used:**
+- 1inch Aqua + Swap VM SDK
+- anvil fork of Robinhood chain
+
 ### Liquidity profiles
 
-3 types can be used
+3 investment risk profiles can be used on Robinhood network:
+- **Conservative**
+- **Balanced**
+- **Aggressive**
 
-| Profile      | Stable Coins (e.g: USDC, EURC) | Crypto Assets (e.g: LINK) | Risky Volatile Assets (e.g: ETH) |
-|--------------|-------------------------------|---------------------------|----------------------------------|
-| Conservative | 50%                           | 30%                       | 20%                              |
-| Balanced     | 25%                           | 50%                       | 25%                              |
-| Aggressive   | 20%                           | 30%                       | 50%                              |
+| Sleeve    | Pair (Robinhood)   | Conservative | Balanced | Aggressive |
+|-----------|--------------------|--------------|----------|------------|
+| Low risk  | USDG / WETH        | 50%          | 25%      | 20%        |
+| Medium risk  | WETH / 1INCH       | 30%          | 50%      | 30%        |
+| High risk | USDG / one stock   | 20%          | 25%      | 50%        |
 
-Let's imagine to start there are 3 pools:
-
-- **Low-Risk**: USDC, EURC (Stable coins, low risk) -> we will use the pool USDC / EURC
-- **Medium-Risk**: ETH, wBTC -> we will use the pool ETH / LINK
-- **High Risk**: PEPE, LINK
-
-We will use the Ethereum network.
-
-Or we could use the 1inch Aqua API on Robinhood to trade tokenized stocks.
 
 ## References
 
