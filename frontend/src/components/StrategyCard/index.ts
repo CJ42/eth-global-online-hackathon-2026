@@ -1,1 +1,8 @@
-export { StrategyCard, StrategyCards } from "./StrategyCard";
+export {
+	liquidityPairs,
+	type Strategy,
+	StrategyCard,
+	StrategyCards,
+	strategies,
+	strategyById,
+} from "./StrategyCard";

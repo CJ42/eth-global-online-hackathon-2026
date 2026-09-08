@@ -8,7 +8,6 @@ import {
 	Tooltip,
 } from "chart.js";
 import { Check } from "lucide-react";
-import { useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +21,7 @@ import {
 import { PROFILE_WEIGHTS, type RiskProfile } from "@/lib/portfolio";
 import styles from "./StrategyCard.module.css";
 
-type Strategy = {
+export type Strategy = {
 	id: RiskProfile;
 	name: string;
 	description: string;
@@ -34,15 +33,22 @@ type StrategyCardProps = {
 	strategy: Strategy;
 	isSelected: boolean;
 	onSelect: (profile: RiskProfile) => void;
+	disabled?: boolean;
+};
+
+type StrategyCardsProps = {
+	selectedProfile: RiskProfile | null;
+	onSelect: (profile: RiskProfile) => void;
+	disabled?: boolean;
 };
 
 ChartJS.register(ArcElement, Tooltip);
 
-export function StrategyCards() {
-	const [selectedProfile, setSelectedProfile] = useState<RiskProfile | null>(
-		null,
-	);
-
+export function StrategyCards({
+	selectedProfile,
+	onSelect,
+	disabled = false,
+}: StrategyCardsProps) {
 	return (
 		<div>
 			<div className={styles.grid}>
@@ -51,7 +57,8 @@ export function StrategyCards() {
 						key={strategy.id}
 						strategy={strategy}
 						isSelected={selectedProfile === strategy.id}
-						onSelect={setSelectedProfile}
+						onSelect={onSelect}
+						disabled={disabled}
 					/>
 				))}
 			</div>
@@ -68,6 +75,7 @@ export function StrategyCard({
 	strategy,
 	isSelected,
 	onSelect,
+	disabled = false,
 }: StrategyCardProps) {
 	const weights = PROFILE_WEIGHTS[strategy.id];
 	const allocations = [
@@ -143,6 +151,7 @@ export function StrategyCard({
 					size="lg"
 					className={styles.selectButton}
 					aria-pressed={isSelected}
+					disabled={disabled}
 					onClick={() => onSelect(strategy.id)}
 				>
 					{isSelected ? "Selected" : "Select"}
@@ -172,9 +181,9 @@ const chartOptions: ChartOptions<"pie"> = {
 	},
 };
 
-const liquidityPairs = ["USDG / WETH", "WETH / 1INCH", "USDG / TSLA"];
+export const liquidityPairs = ["USDG / WETH", "WETH / 1INCH", "USDG / TSLA"];
 
-const strategies: Strategy[] = [
+export const strategies: Strategy[] = [
 	{
 		id: "conservative",
 		name: "Conservative",
@@ -198,6 +207,6 @@ const strategies: Strategy[] = [
 	},
 ];
 
-const strategyById = Object.fromEntries(
+export const strategyById = Object.fromEntries(
 	strategies.map((strategy) => [strategy.id, strategy]),
 ) as Record<RiskProfile, Strategy>;

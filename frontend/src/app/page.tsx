@@ -1,4 +1,4 @@
-import { StrategyCards } from "@/components/StrategyCard";
+import { ShipStrategy } from "@/feature/ShipStrategy";
 import styles from "./page.module.css";
 
 export default function HomePage() {
@@ -16,7 +16,7 @@ export default function HomePage() {
 						and tokenized stocks.
 					</p>
 				</header>
-				<StrategyCards />
+				<ShipStrategy />
 			</section>
 		</main>
 	);

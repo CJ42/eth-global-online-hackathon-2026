@@ -8,7 +8,7 @@ import {
 	keccak256,
 	type WalletClient,
 } from "viem";
-import { getTransactionCount } from "viem/actions";
+import { getTransactionCount, waitForTransactionReceipt } from "viem/actions";
 import { AQUA_CONTRACT, SWAP_VM_ROUTER } from "@/config";
 import type { PairAllocation, TokenApproval } from "./portfolio";
 import { approveAquaToSpendTokens } from "./tokens";
@@ -138,6 +138,7 @@ export async function shipAquaPortfolio({
 			token: approval.token.address,
 			amount: approval.amount,
 		});
+		await waitForTransactionReceipt(walletClient, { hash });
 		approvalHashes.push(hash);
 	}
 

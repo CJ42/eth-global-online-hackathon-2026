@@ -44,15 +44,13 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 
 - [x] Make the dashboard that allows to select among the three different strategies available
 
-- [ ] Make the "Select" button in the UI to implement a real `ship()` flow that interact with the Robinhood local chain fork (via some backend). Should re-use same logic flow as within `main.ts`
-  - [ ] it should change the amounts selected based on the strategy picked. It should build the the amounts for the 3 x strategies. 
-  - [ ] a final "Ship" button (or a more UI / UX friendly word) ship the strategy and generate the on-chain transaction.
-  - [ ] Should call a backend API route created + show that ship was executed show the tx hash for Robinhood + [listen to some events from the `Aqua.sol` contract](https://github.com/1inch/aqua/blob/9c5c42e5840e8741fba3597c48456c9510212b66/src/interfaces/IAqua.sol#L40-L51)
-  - [ ] Ideally, I want to visualise the strategy shipped to Aqua in the UI.
+- [ ] **🟪 In Review** Make the "Select" button in the UI to implement a real `ship()` flow that interact with the Robinhood local chain fork (via some backend). Should re-use same logic flow as within `main.ts`
+  - [x] it should change the amounts selected based on the strategy picked. It should build the amounts for the 3 x strategies. 
+  - [x] a final "Ship" button (or a more UI / UX friendly word) ship the strategy and generate the on-chain transaction.
+  - [x] Should call a backend API route created + show that ship was executed show the tx hash for Robinhood + [listen to some events from the `Aqua.sol` contract](https://github.com/1inch/aqua/blob/9c5c42e5840e8741fba3597c48456c9510212b66/src/interfaces/IAqua.sol#L40-L51)
+  - [x] Ideally, I want to visualise the strategy shipped to Aqua in the UI.
 
 - [ ] Change `config.ts` to move the wallet server-side behind an API route. Split the logic in the backend with the API, create an `api/` route like `GET /wallet` to get the user wallet
-- [ ] 
-• config.ts builds a wallet client at module scope with a hardcoded key — risk of leaking into the browser bundle if imported client-side. Move ship/rebalance behind Next API routes.
 
 ## 📅 Wednesday
 - [ ] Allow to enter the input amount and it will calculate the split
