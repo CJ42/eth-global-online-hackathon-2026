@@ -1,12 +1,5 @@
-import {
-	createTestClient,
-	http,
-	parseEther,
-	publicActions,
-	walletActions,
-} from "viem";
-import { robinhood } from "viem/chains";
-import { maker, publicClient, LOCALHOST_RPC_URL, wallet } from "@/config";
+import { parseEther } from "viem";
+import { maker, publicClient, testClient, wallet } from "@/config";
 import {
 	buildPortfolioAllocations,
 	FIXED_TOKEN_PRICES_USD,
@@ -27,14 +20,6 @@ export async function POST(request: Request) {
 		const body = await request.json();
 		const { profile } = parseShipPortfolioRequest(body);
 
-		const testClient = createTestClient({
-			chain: robinhood,
-			mode: "anvil",
-			transport: http(LOCALHOST_RPC_URL),
-		})
-			.extend(publicActions)
-			.extend(walletActions);
-
 		await testClient.impersonateAccount({ address: maker });
 		// Fork demos: ensure gas for repeated ships without restarting Anvil.
 		await testClient.setBalance({
@@ -54,10 +39,6 @@ export async function POST(request: Request) {
 			allocations,
 			approvals,
 		});
-
-		for (const approvalHash of shipResult.approvalHashes) {
-			await publicClient.waitForTransactionReceipt({ hash: approvalHash });
-		}
 
 		const sleeves: ShippedSleeveResult[] = [];
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { strategyById } from "@/components/StrategyCard";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -34,7 +33,6 @@ export function ShipConfirmPanel({
 	error,
 	onShip,
 }: ShipConfirmPanelProps) {
-	const strategy = strategyById[profile];
 	const weights = PROFILE_WEIGHTS[profile];
 
 	return (

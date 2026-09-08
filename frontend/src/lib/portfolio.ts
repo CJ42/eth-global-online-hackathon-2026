@@ -1,15 +1,18 @@
-import type { Address } from "viem";
 import { TOKENIZED_STOCKS, TOKENS } from "@/constants";
+import { usdToTokenAmount } from "./tokens";
 
 export type RiskProfile = "conservative" | "balanced" | "aggressive";
 
 export type SleeveId = "low" | "medium" | "high";
 
-export interface TokenMeta {
-	symbol: string;
-	address: Address;
-	decimals: number;
-}
+export const TOKEN_META = {
+	USDG: { symbol: "USDG", address: TOKENS.USDG },
+	WETH: { symbol: "WETH", address: TOKENS.WETH },
+	ONEINCH: { symbol: "ONEINCH", address: TOKENS.ONEINCH },
+	TSLA: { symbol: "TSLA", address: TOKENIZED_STOCKS.TSLA },
+} as const;
+
+export type TokenMeta = (typeof TOKEN_META)[keyof typeof TOKEN_META];
 
 export interface SleeveWeights {
 	low: number;
@@ -45,7 +48,6 @@ export interface BuildPortfolioAllocationsInput {
 	totalUsd: number;
 	weights: SleeveWeights;
 	prices: TokenPricesUsd;
-	highRiskStock?: TokenMeta;
 }
 
 export interface BuildPortfolioAllocationsResult {
@@ -59,29 +61,6 @@ export const PROFILE_WEIGHTS = {
 	aggressive: { low: 0.2, medium: 0.3, high: 0.5 },
 } as const satisfies Record<RiskProfile, SleeveWeights>;
 
-export const TOKEN_META = {
-	USDG: {
-		symbol: "USDG",
-		address: TOKENS.USDG,
-		decimals: 6,
-	},
-	WETH: {
-		symbol: "WETH",
-		address: TOKENS.WETH,
-		decimals: 18,
-	},
-	ONEINCH: {
-		symbol: "ONEINCH",
-		address: TOKENS.ONEINCH,
-		decimals: 18,
-	},
-	TSLA: {
-		symbol: "TSLA",
-		address: TOKENIZED_STOCKS.TSLA,
-		decimals: 18,
-	},
-} as const satisfies Record<string, TokenMeta>;
-
 export const FIXED_TOKEN_PRICES_USD = {
 	USDG: 1,
 	WETH: 2500,
@@ -89,14 +68,12 @@ export const FIXED_TOKEN_PRICES_USD = {
 	TSLA: 350,
 } as const satisfies TokenPricesUsd;
 
-const PRICE_SCALE = 1_000_000_000;
 const WEIGHT_TOLERANCE = 1e-9;
 
 export function buildPortfolioAllocations({
 	totalUsd,
 	weights,
 	prices,
-	highRiskStock = TOKEN_META.TSLA,
 }: BuildPortfolioAllocationsInput): BuildPortfolioAllocationsResult {
 	if (!(totalUsd > 0)) throw new Error("totalUsd must be greater than 0");
 
@@ -128,9 +105,9 @@ export function buildPortfolioAllocations({
 			sleeve: "high",
 			usdValue: highUsd,
 			tokenA: TOKEN_META.USDG,
-			tokenB: highRiskStock,
+			tokenB: TOKEN_META.TSLA,
 			priceA: prices.USDG,
-			priceB: getStockPrice({ stock: highRiskStock, prices }),
+			priceB: prices.TSLA,
 		}),
 	];
 
@@ -138,26 +115,6 @@ export function buildPortfolioAllocations({
 		allocations,
 		approvals: aggregateApprovals(allocations),
 	};
-}
-
-export function usdToTokenAmount({
-	usd,
-	priceUsd,
-	decimals,
-}: {
-	usd: number;
-	priceUsd: number;
-	decimals: number;
-}): bigint {
-	if (!(usd >= 0)) throw new Error("usd must be non-negative");
-	if (!(priceUsd > 0)) throw new Error("priceUsd must be greater than 0");
-	if (!(Number.isInteger(decimals) && decimals >= 0))
-		throw new Error("decimals must be a non-negative integer");
-
-	const usdScaled = BigInt(Math.round(usd * PRICE_SCALE));
-	const priceScaled = BigInt(Math.round(priceUsd * PRICE_SCALE));
-
-	return (usdScaled * BigInt(10) ** BigInt(decimals)) / priceScaled;
 }
 
 function buildPairAllocation({
@@ -187,7 +144,7 @@ function buildPairAllocation({
 				amount: usdToTokenAmount({
 					usd: halfUsd,
 					priceUsd: priceA,
-					decimals: tokenA.decimals,
+					symbol: tokenA.symbol,
 				}),
 			},
 			{
@@ -196,7 +153,7 @@ function buildPairAllocation({
 				amount: usdToTokenAmount({
 					usd: halfUsd,
 					priceUsd: priceB,
-					decimals: tokenB.decimals,
+					symbol: tokenB.symbol,
 				}),
 			},
 		],
@@ -238,15 +195,4 @@ function assertValidPrices(prices: TokenPricesUsd) {
 	for (const [symbol, price] of Object.entries(prices)) {
 		if (!(price > 0)) throw new Error(`${symbol} price must be greater than 0`);
 	}
-}
-
-function getStockPrice({
-	stock,
-	prices,
-}: {
-	stock: TokenMeta;
-	prices: TokenPricesUsd;
-}): number {
-	if (stock.symbol === "TSLA") return prices.TSLA;
-	throw new Error(`missing price for stock ${stock.symbol}`);
 }

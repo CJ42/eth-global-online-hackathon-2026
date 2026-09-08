@@ -2,38 +2,24 @@ import { ABI } from "@1inch/aqua-sdk";
 import type { Address, Hex, Log, TransactionReceipt } from "viem";
 import { formatUnits, getAddress, parseEventLogs } from "viem";
 import { TOKEN_ADDRESS_BY_SYMBOL } from "@/constants";
-import { type RiskProfile, type SleeveId, TOKEN_META } from "./portfolio";
+import type { RiskProfile, SleeveId } from "./portfolio";
+import { getTokenDecimals } from "./tokens";
 
 const DISPLAY_SYMBOL: Record<string, string> = {
 	ONEINCH: "1INCH",
 };
 
-const TOKEN_BY_ADDRESS = new Map(
+const TOKEN_SYMBOL_BY_ADDRESS = new Map(
 	Object.entries(TOKEN_ADDRESS_BY_SYMBOL).map(([symbol, address]) => [
 		getAddress(address),
-		{
-			symbol,
-			decimals: TOKEN_META[symbol as keyof typeof TOKEN_META]?.decimals ?? 18,
-		},
+		symbol,
 	]),
 );
 
-function resolvePushedToken(token: Address): {
-	symbol: string;
-	decimals: number;
-} {
-	const known = TOKEN_BY_ADDRESS.get(getAddress(token));
-	if (!known) return { symbol: token, decimals: 18 };
-
-	return {
-		symbol: DISPLAY_SYMBOL[known.symbol] ?? known.symbol,
-		decimals: known.decimals,
-	};
-}
-
 export function formatPushedMessage(token: Address, amount: bigint): string {
-	const { symbol, decimals } = resolvePushedToken(token);
-	return `${formatUnits(amount, decimals)} ${symbol} added to strategy`;
+	const symbol = TOKEN_SYMBOL_BY_ADDRESS.get(getAddress(token));
+	const displaySymbol = symbol ? (DISPLAY_SYMBOL[symbol] ?? symbol) : token;
+	return `${formatUnits(amount, getTokenDecimals(symbol))} ${displaySymbol} added to strategy`;
 }
 
 export const FIXED_SHIP_TOTAL_USD = 1000;

@@ -5,8 +5,8 @@ import {
 	FIXED_TOKEN_PRICES_USD,
 	PROFILE_WEIGHTS,
 	TOKEN_META,
-	usdToTokenAmount,
 } from "./portfolio";
+import { usdToTokenAmount } from "./tokens";
 
 describe("usdToTokenAmount", () => {
 	test("converts USDG with 6 decimals", () => {
@@ -14,7 +14,7 @@ describe("usdToTokenAmount", () => {
 			usdToTokenAmount({
 				usd: 250,
 				priceUsd: 1,
-				decimals: 6,
+				symbol: "USDG",
 			}),
 		).toBe(parseUnits("250", 6));
 	});
@@ -24,7 +24,7 @@ describe("usdToTokenAmount", () => {
 			usdToTokenAmount({
 				usd: 250,
 				priceUsd: 2500,
-				decimals: 18,
+				symbol: "WETH",
 			}),
 		).toBe(parseEther("0.1"));
 	});
@@ -34,7 +34,7 @@ describe("usdToTokenAmount", () => {
 			usdToTokenAmount({
 				usd: 100,
 				priceUsd: 350,
-				decimals: 18,
+				symbol: "TSLA",
 			}),
 		).toBe((BigInt(100) * BigInt(10) ** BigInt(18)) / BigInt(350));
 	});
@@ -44,7 +44,7 @@ describe("usdToTokenAmount", () => {
 			usdToTokenAmount({
 				usd: 100,
 				priceUsd: 0,
-				decimals: 18,
+				symbol: "TSLA",
 			}),
 		).toThrow("priceUsd must be greater than 0");
 	});
