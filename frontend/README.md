@@ -27,3 +27,5 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 - [ ] (optional) Split the logic in the backend with the API, create `api/` routes
 
 - [ ] Implement rebalancing using `dock` -> then `ship`. We will implement this re-balancing manually first
+
+- [ ] Implement fiat conversion rate to convert crypto + stock prices into actual $$$ values
