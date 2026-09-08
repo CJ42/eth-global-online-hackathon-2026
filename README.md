@@ -56,6 +56,7 @@ Maker wallet                    Aqua registry                 SwapVM router
 - https://developers.uniswap.org/dashboard/welcome
 - https://developers.uniswap.org/hackathon-feedback
 - https://github.com/Uniswap/uniswap-ai
+- (optional) see if code in this template can be re-used: https://github.com/1inch/aqua-app-template/blob/main/test/XYCSwap.test.ts
 
 ## Pre-requisites
 

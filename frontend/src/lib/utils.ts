@@ -131,5 +131,5 @@ export async function logTokenBalances(label: string, maker: Address) {
 	console.log(`${label} USDG: ${formatUnits(usdgBalance, 6)}`);
 	console.log(`${label} WETH: ${formatEther(wethBalance)}`);
 	console.log(`${label} 1INCH: ${formatUnits(oneinchBalance, 18)}`);
-	console.log(`${label} WETH: ${formatUnits(tslaBalance, 18)}`);
+	console.log(`${label} TSLA: ${formatUnits(tslaBalance, 18)}`);
 }
