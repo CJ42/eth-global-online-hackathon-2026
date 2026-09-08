@@ -1,5 +1,5 @@
 import { parseEther } from "viem";
-import { maker, publicClient, testClient, wallet } from "@/config";
+import { maker } from "@/config";
 import {
 	buildPortfolioAllocations,
 	FIXED_TOKEN_PRICES_USD,
@@ -14,15 +14,16 @@ import {
 	strategyHashFromEvents,
 } from "@/lib/ship";
 import { shipAquaPortfolio } from "@/lib/strategy";
+import { robinhoodForkClient } from "../fork";
 
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
 		const { profile } = parseShipPortfolioRequest(body);
 
-		await testClient.impersonateAccount({ address: maker });
+		await robinhoodForkClient.impersonateAccount({ address: maker });
 		// Fork demos: ensure gas for repeated ships without restarting Anvil.
-		await testClient.setBalance({
+		await robinhoodForkClient.setBalance({
 			address: maker,
 			value: parseEther("1"),
 		});
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
 
 		const shipResult = await shipAquaPortfolio({
 			maker,
-			walletClient: wallet,
+			walletClient: robinhoodForkClient,
 			allocations,
 			approvals,
 		});
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
 		const sleeves: ShippedSleeveResult[] = [];
 
 		for (const shipped of shipResult.shipped) {
-			const receipt = await publicClient.waitForTransactionReceipt({
+			const receipt = await robinhoodForkClient.waitForTransactionReceipt({
 				hash: shipped.hash,
 			});
 			const events = decodeAquaShipEvents(receipt);

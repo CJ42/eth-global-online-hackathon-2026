@@ -8,7 +8,7 @@ import {
 } from "viem";
 import { robinhood } from "viem/chains";
 
-import { maker, wallet } from "@/config";
+import { LOCALHOST_RPC_URL, maker } from "@/config";
 import { distributeInitialTokens, logTokenBalances } from "@/lib/utils";
 import {
 	buildPortfolioAllocations,
@@ -39,14 +39,15 @@ async function main() {
 	// 2. impersonate liquidity provider on Robinhood mainnet
 	// + connect to anvil fork running for Robinhood
 	const testClient = createTestClient({
+		account: maker,
 		chain: robinhood,
 		mode: "anvil",
-		transport: http("http://127.0.0.1:8545"),
+		transport: http(LOCALHOST_RPC_URL),
 	})
 		.extend(publicActions)
 		.extend(walletActions);
 
-		await testClient.setBalance({ address: maker, value: parseEther("1") })
+	await testClient.setBalance({ address: maker, value: parseEther("1") });
 	await testClient.impersonateAccount({ address: maker });
 
 	// 3. calculate Conservative portfolio allocations from fixed prices
@@ -62,7 +63,7 @@ async function main() {
 	// 4. approve once per token and ship all three Aqua strategies
 	const result = await shipAquaPortfolio({
 		maker,
-		walletClient: wallet,
+		walletClient: testClient,
 		allocations,
 		approvals,
 	});

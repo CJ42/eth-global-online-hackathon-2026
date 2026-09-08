@@ -50,7 +50,7 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
   - [x] Should call a backend API route created + show that ship was executed show the tx hash for Robinhood + [listen to some events from the `Aqua.sol` contract](https://github.com/1inch/aqua/blob/9c5c42e5840e8741fba3597c48456c9510212b66/src/interfaces/IAqua.sol#L40-L51)
   - [x] Ideally, I want to visualise the strategy shipped to Aqua in the UI.
 
-- [ ] Change `config.ts` to move the wallet server-side behind an API route. Split the logic in the backend with the API, create an `api/` route like `GET /wallet` to get the user wallet
+- [x] Keep the wallet server-side and expose only its address through `GET /api/wallet`
 
 ## 📅 Wednesday
 - [ ] Allow to enter the input amount and it will calculate the split
@@ -64,8 +64,13 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 
 5. Prioritized 6-day plan
 
-- **Tuesday 8th** — prove ship() works end-to-end on the fork; build the taker swap (this is the actual 1inch qualification bar); confirm Uniswap Trade API covers your target chain, grab API key.
-- **Wednesday 9th** — build dock() + re-ship rebalancing; wire the UI's Select button to real API routes so it triggers real fork transactions.
+- **Tuesday 8th** 
+  - ✅ prove ship() works end-to-end on the fork; 
+  - build the taker swap (this is the actual 1inch qualification bar); 
+  - ☑️ (**passing**) confirm Uniswap Trade API covers your target chain, grab API key.
+- **Wednesday 9th** 
+  — build dock() + re-ship rebalancing; 
+  - ✅ wire the UI's Select button to real API routes so it triggers real fork transactions.
 - **Thursday 10th** — Uniswap integration: live Trade API prices replacing the hardcoded ones; use a live price to calibrate the conservative sleeve's band.
 - **Friday 11th** — the money-shot: live chart comparing your SwapVM rate vs real Uniswap price. Write FEEDBACK.md, submit the Uniswap form, add a "for judges" README section with file/line pointers. Non-negotiable, don't defer.
 - **Saturday 12th** — polish, fix the small bugs above, record a backup demo video (fund → ship 3 → taker swap → switch profile → dock+re-ship → chart re-converges).
