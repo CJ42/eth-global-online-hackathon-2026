@@ -22,6 +22,8 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 
 # TODO List
 
-- [ ] Make the dashboard that allows to enter the amount in $$$ and it will then allow you to select among the three different strategies
+- [ ] Make the dashboard that allows to select among the three different strategies available
+- [ ] Allow to enter the input amount and it will calculate the split
+- [ ] (optional) Split the logic in the backend with the API, create `api/` routes
 
-- [ ] Implement rebalancing using `dock` -> then `ship`
+- [ ] Implement rebalancing using `dock` -> then `ship`. We will implement this re-balancing manually first

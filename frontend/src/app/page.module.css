@@ -1,29 +1,57 @@
 .main {
 	min-height: 100svh;
-	display: grid;
-	place-items: center;
-	padding: 2rem 1.5rem;
+	padding: 4.5rem 1.5rem 3rem;
+	background:
+		radial-gradient(circle at 92% 4%, rgb(194 232 239 / 32%), transparent 28rem),
+		#fff;
 }
 
-.stack {
-	display: flex;
-	flex-direction: column;
-	gap: 1.5rem;
-	width: min(100%, 36rem);
+.dashboard {
+	width: min(100%, 75rem);
+	margin: 0 auto;
+}
+
+.header {
+	max-width: 63rem;
+	margin-bottom: 3rem;
+}
+
+.eyebrow {
+	margin-bottom: 1rem;
+	color: #475467;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
 }
 
 .title {
-	font-size: 2rem;
+	max-width: 62rem;
+	font-size: clamp(2.25rem, 5vw, 4.75rem);
 	font-weight: 700;
-	letter-spacing: -0.03em;
-	line-height: 1.15;
+	letter-spacing: -0.055em;
+	line-height: 0.98;
+	text-wrap: balance;
 }
 
 .subtitle {
-	color: var(--muted-foreground);
+	max-width: 44rem;
+	margin-top: 1.5rem;
+	color: #667085;
+	font-size: 1.05rem;
+	line-height: 1.65;
 }
 
-.actions {
-	display: flex;
-	gap: 0.75rem;
+@media (max-width: 640px) {
+	.main {
+		padding: 3rem 1rem 2rem;
+	}
+
+	.header {
+		margin-bottom: 2rem;
+	}
+
+	.title {
+		font-size: 2.5rem;
+	}
 }

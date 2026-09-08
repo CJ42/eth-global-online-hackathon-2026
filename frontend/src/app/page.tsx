@@ -1,38 +1,23 @@
-import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-
+import { StrategyCards } from "@/components/StrategyCard";
 import styles from "./page.module.css";
 
 export default function HomePage() {
 	return (
 		<main className={styles.main}>
-			<div className={styles.stack}>
-				<div>
-					<h1 className={styles.title}>Aqua Portfolio</h1>
+			<section className={styles.dashboard} aria-labelledby="strategies-title">
+				<header className={styles.header}>
+					<p className={styles.eyebrow}>Aqua Portfolio</p>
+					<h1 id="strategies-title" className={styles.title}>
+						Pre-built investment and rebalancing strategies adapted to your
+						tolerance to risk
+					</h1>
 					<p className={styles.subtitle}>
-						Next.js + shadcn/ui. Pick a liquidity profile, then ship Aqua
-						strategies.
+						Choose how your liquidity is allocated across stable assets, crypto,
+						and tokenized stocks.
 					</p>
-				</div>
-				<Card>
-					<CardHeader>
-						<CardTitle>Get started</CardTitle>
-						<CardDescription>
-							Conservative, Balanced, and Aggressive profiles will live here.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className={styles.actions}>
-						<Button>Open dashboard</Button>
-						<Button variant="outline">View markets</Button>
-					</CardContent>
-				</Card>
-			</div>
+				</header>
+				<StrategyCards />
+			</section>
 		</main>
 	);
 }

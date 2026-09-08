@@ -56,3 +56,11 @@ Maker wallet                    Aqua registry                 SwapVM router
 - https://developers.uniswap.org/dashboard/welcome
 - https://developers.uniswap.org/hackathon-feedback
 - https://github.com/Uniswap/uniswap-ai
+
+## Pre-requisites
+
+This project runs as a fork of Robinhood on anvil. Run one using the following command:
+
+```bash
+anvil --fork-url https://rpc.mainnet.chain.robinhood.com
+```

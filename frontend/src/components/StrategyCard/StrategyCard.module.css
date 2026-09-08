@@ -1,0 +1,162 @@
+.grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1.25rem;
+}
+
+.card {
+	gap: 0;
+	overflow: hidden;
+	border: 2px solid transparent;
+	border-radius: 1.25rem;
+	box-shadow: none;
+	transition:
+		transform 180ms ease,
+		border-color 180ms ease,
+		box-shadow 180ms ease;
+}
+
+.card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 9%);
+}
+
+.conservative {
+	background: #c2e8ef;
+}
+
+.balanced {
+	background: #f9f1e1;
+}
+
+.aggressive {
+	background: #e5e2f8;
+}
+
+.selected {
+	border-color: #101828;
+	box-shadow: 0 0 0 3px rgb(16 24 40 / 10%);
+}
+
+.cardHeader {
+	gap: 1.5rem;
+	padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.headingRow {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.cardTitle {
+	font-size: 1.35rem;
+	letter-spacing: -0.025em;
+}
+
+.cardDescription {
+	max-width: 16rem;
+	margin-top: 0.5rem;
+	color: rgb(16 24 40 / 70%);
+	line-height: 1.5;
+}
+
+.selectedMark {
+	display: grid;
+	flex: 0 0 auto;
+	width: 1.75rem;
+	height: 1.75rem;
+	place-items: center;
+	border-radius: 999px;
+	background: #101828;
+	color: white;
+}
+
+.selectedMark svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+.chart {
+	width: 8.75rem;
+	height: 8.75rem;
+	margin: 0 auto;
+}
+
+.cardContent {
+	padding: 0 1.5rem;
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+	padding: 0.75rem 0;
+	border-bottom: 1px solid rgb(16 24 40 / 14%);
+	text-align: left;
+}
+
+.table th {
+	color: rgb(16 24 40 / 60%);
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.table th:last-child,
+.table td:last-child {
+	text-align: right;
+}
+
+.table td:last-child {
+	font-weight: 700;
+}
+
+.cardFooter {
+	padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.selectButton {
+	width: 100%;
+	height: 2.75rem;
+	border-radius: 0.625rem;
+	background: #101828;
+	color: white;
+}
+
+.selectButton:hover {
+	background: #273346;
+}
+
+.selectionStatus {
+	min-height: 1.5rem;
+	margin-top: 1rem;
+	color: #667085;
+	font-size: 0.875rem;
+	text-align: center;
+}
+
+@media (max-width: 900px) {
+	.grid {
+		grid-template-columns: 1fr;
+		max-width: 32rem;
+		margin: 0 auto;
+	}
+
+	.chart {
+		width: 8rem;
+		height: 8rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.card {
+		transition: none;
+	}
+}
