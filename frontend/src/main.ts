@@ -51,21 +51,18 @@ async function main() {
 	await testClient.impersonateAccount({ address: maker });
 
 	// 3. calculate Conservative portfolio allocations from fixed prices
-	const { allocations, approvals } = buildPortfolioAllocations({
+	const { allocations } = buildPortfolioAllocations({
 		totalUsd: 1000,
 		weights: PROFILE_WEIGHTS.conservative,
 		prices: FIXED_TOKEN_PRICES_USD,
 	});
 
 	console.log("📦 Portfolio allocations:", allocations);
-	console.log("✅ Aggregate approvals:", approvals);
 
-	// 4. approve once per token and ship all three Aqua strategies
+	// 4. approve and ship all three Aqua strategies
 	const result = await shipAquaPortfolio({
-		maker,
 		walletClient: testClient,
 		allocations,
-		approvals,
 	});
 
 	console.log("💧 Aqua portfolio shipped:", result);

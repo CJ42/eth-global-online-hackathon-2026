@@ -35,21 +35,20 @@ export function usdToTokenAmount({
 
 export async function approveAquaToSpendTokens({
 	walletClient,
-	account,
 	token,
 	amount,
 }: {
 	walletClient: WalletClient;
-	account: Account | Address;
 	token: Address;
 	amount: bigint;
 }): Promise<Hex> {
+	const { account } = walletClient;
 	return walletClient.writeContract({
 		address: token,
 		abi: erc20Abi,
 		functionName: "approve",
 		args: [AQUA_CONTRACT.toString(), amount],
-		account,
+		account: account as Account,
 		chain: walletClient.chain,
 	});
 }

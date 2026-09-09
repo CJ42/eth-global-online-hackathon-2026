@@ -33,16 +33,11 @@ export interface LiquidityLeg {
 	usdValue: number;
 }
 
-export interface PairAllocation {
+export type PairAllocation = {
 	sleeve: SleeveId;
 	usdValue: number;
 	legs: [LiquidityLeg, LiquidityLeg];
-}
-
-export interface TokenApproval {
-	token: TokenMeta;
-	amount: bigint;
-}
+};
 
 export interface BuildPortfolioAllocationsInput {
 	totalUsd: number;
@@ -52,7 +47,6 @@ export interface BuildPortfolioAllocationsInput {
 
 export interface BuildPortfolioAllocationsResult {
 	allocations: [PairAllocation, PairAllocation, PairAllocation];
-	approvals: TokenApproval[];
 }
 
 export const PROFILE_WEIGHTS = {
@@ -113,7 +107,6 @@ export function buildPortfolioAllocations({
 
 	return {
 		allocations,
-		approvals: aggregateApprovals(allocations),
 	};
 }
 
@@ -158,27 +151,6 @@ function buildPairAllocation({
 			},
 		],
 	};
-}
-
-function aggregateApprovals(allocations: PairAllocation[]): TokenApproval[] {
-	const byAddress = new Map<string, TokenApproval>();
-
-	for (const allocation of allocations) {
-		for (const leg of allocation.legs) {
-			const existing = byAddress.get(leg.token.address);
-			if (!existing) {
-				byAddress.set(leg.token.address, {
-					token: leg.token,
-					amount: leg.amount,
-				});
-				continue;
-			}
-
-			existing.amount += leg.amount;
-		}
-	}
-
-	return [...byAddress.values()];
 }
 
 function assertValidWeights(weights: SleeveWeights) {

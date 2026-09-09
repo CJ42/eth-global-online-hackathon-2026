@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Address } from "@1inch/aqua-sdk";
 import { TOKENS } from "@/constants";
-import { buildAquaStrategySalt, type LiquidityProvision } from "./strategy";
+import { generateAquaStrategySalt, type LiquidityProvision } from "./strategy";
 
 const liquidityProvision: LiquidityProvision = [
 	{
@@ -17,18 +17,18 @@ const liquidityProvision: LiquidityProvision = [
 describe("buildAquaStrategySalt", () => {
 	test("is deterministic for the same provision and nonce", () => {
 		const input = { liquidityProvision, makerNonce: 42 };
-		const salt = buildAquaStrategySalt(input);
+		const salt = generateAquaStrategySalt(input);
 
-		expect(salt).toBe(buildAquaStrategySalt(input));
+		expect(salt).toBe(generateAquaStrategySalt(input));
 		expect(salt).toBeLessThanOrEqual(BigInt("18446744073709551615"));
 	});
 
 	test("changes when the maker nonce changes", () => {
-		const first = buildAquaStrategySalt({
+		const first = generateAquaStrategySalt({
 			liquidityProvision,
 			makerNonce: 42,
 		});
-		const second = buildAquaStrategySalt({
+		const second = generateAquaStrategySalt({
 			liquidityProvision,
 			makerNonce: 43,
 		});
@@ -45,11 +45,11 @@ describe("buildAquaStrategySalt", () => {
 			},
 		];
 
-		const first = buildAquaStrategySalt({
+		const first = generateAquaStrategySalt({
 			liquidityProvision,
 			makerNonce: 42,
 		});
-		const second = buildAquaStrategySalt({
+		const second = generateAquaStrategySalt({
 			liquidityProvision: changedProvision,
 			makerNonce: 42,
 		});

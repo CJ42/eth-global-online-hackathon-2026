@@ -51,8 +51,8 @@ describe("usdToTokenAmount", () => {
 });
 
 describe("buildPortfolioAllocations", () => {
-	test("builds Conservative $1000 sleeves and aggregate approvals", () => {
-		const { allocations, approvals } = buildPortfolioAllocations({
+	test("builds Conservative $1000 sleeves", () => {
+		const { allocations } = buildPortfolioAllocations({
 			totalUsd: 1000,
 			weights: PROFILE_WEIGHTS.conservative,
 			prices: FIXED_TOKEN_PRICES_USD,
@@ -76,18 +76,6 @@ describe("buildPortfolioAllocations", () => {
 		expect(allocations[2].legs[1].amount).toBe(
 			(BigInt(100) * BigInt(10) ** BigInt(18)) / BigInt(350),
 		);
-
-		const bySymbol = Object.fromEntries(
-			approvals.map((approval) => [approval.token.symbol, approval.amount]),
-		);
-
-		expect(bySymbol.USDG).toBe(parseUnits("350", 6));
-		expect(bySymbol.WETH).toBe(parseEther("0.16"));
-		expect(bySymbol.ONEINCH).toBe(parseUnits("1500", 18));
-		expect(bySymbol.TSLA).toBe(
-			(BigInt(100) * BigInt(10) ** BigInt(18)) / BigInt(350),
-		);
-		expect(approvals).toHaveLength(4);
 	});
 
 	test("rejects weights that do not sum to 1", () => {

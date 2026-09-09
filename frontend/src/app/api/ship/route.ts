@@ -28,26 +28,21 @@ export async function POST(request: Request) {
 			value: parseEther("1"),
 		});
 
-		const { allocations, approvals } = buildPortfolioAllocations({
+		const { allocations } = buildPortfolioAllocations({
 			totalUsd: FIXED_SHIP_TOTAL_USD,
 			weights: PROFILE_WEIGHTS[profile],
 			prices: FIXED_TOKEN_PRICES_USD,
 		});
 
 		const shipResult = await shipAquaPortfolio({
-			maker,
 			walletClient: robinhoodForkClient,
 			allocations,
-			approvals,
 		});
 
 		const sleeves: ShippedSleeveResult[] = [];
 
 		for (const shipped of shipResult.shipped) {
-			const receipt = await robinhoodForkClient.waitForTransactionReceipt({
-				hash: shipped.hash,
-			});
-			const events = decodeAquaShipEvents(receipt);
+			const events = decodeAquaShipEvents(shipped.receipt);
 
 			sleeves.push({
 				sleeve: shipped.sleeve,
