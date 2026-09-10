@@ -1,6 +1,7 @@
 import { Address, AquaProtocolContract, type CallInfo } from "@1inch/aqua-sdk";
 import { AquaXYCAmmStrategy, MakerTraits, Order } from "@1inch/swap-vm-sdk";
 import {
+	type Address as EvmAddress,
 	encodeAbiParameters,
 	type Hex,
 	hexToBigInt,
@@ -24,23 +25,29 @@ export type LiquidityProvision = [
 	},
 ];
 
-export interface AquaStrategyInput {
+export type AquaStrategyInput = {
 	maker: `0x${string}`;
 	walletClient: WalletClient;
 	liquidityProvision: LiquidityProvision;
-}
+};
 
-export interface ShippedStrategy {
+export type BuiltAquaStrategy = {
+	shipTx: CallInfo;
+	strategy: Hex;
+};
+
+export type ShippedStrategy = {
 	sleeve: PairAllocation["sleeve"];
 	hash: Hex;
 	receipt: TransactionReceipt;
-}
+	strategy: Hex;
+};
 
 export async function buildAquaStrategy({
 	maker,
 	walletClient,
 	liquidityProvision,
-}: AquaStrategyInput): Promise<CallInfo> {
+}: AquaStrategyInput): Promise<BuiltAquaStrategy> {
 	const aquaRegistry = new AquaProtocolContract(AQUA_CONTRACT);
 	const makerNonce = await getTransactionCount(walletClient, {
 		address: maker,
@@ -59,21 +66,20 @@ export async function buildAquaStrategy({
 		traits: MakerTraits.default(),
 	});
 
-	return aquaRegistry.ship({
-		app: SWAP_VM_ROUTER,
-		strategy: order.encode(),
-		amountsAndTokens: liquidityProvision,
-	});
+	const strategy = order.encode().toString() as Hex;
+
+	return {
+		shipTx: aquaRegistry.ship({
+			app: SWAP_VM_ROUTER,
+			strategy: order.encode(),
+			amountsAndTokens: liquidityProvision,
+		}),
+		strategy,
+	};
 }
 
 /**
- *
- * @dev approve tokens part of the strategy + ship strategy to Aqua registry
- *
- * @param param0
- * @returns Three tx hashes:
- * - two for the token approvals to Aqua
- * - one for the tx to ship to Aqua
+ * Approve both legs of an allocation, then ship that strategy to Aqua.
  */
 export async function shipAquaStrategy({
 	walletClient,
@@ -87,15 +93,10 @@ export async function shipAquaStrategy({
 
 	const liquidityProvision = toLiquidityProvision(allocation);
 
-	// We could have made a `for` loop, but since there is only two liquidity pairs
-	// Make it explicitly readable for hackthon judges
-
-	// Token0
-	const addressToken0 = liquidityProvision[0].token.toString();
+	// Explicit for hackathon judges: each pair has exactly two tokens.
+	const addressToken0 = liquidityProvision[0].token.toString() as EvmAddress;
 	const amountToken0 = liquidityProvision[0].amount;
-
-	// Token0
-	const addressToken1 = liquidityProvision[1].token.toString();
+	const addressToken1 = liquidityProvision[1].token.toString() as EvmAddress;
 	const amountToken1 = liquidityProvision[1].amount;
 
 	const approvalTxHashToken0 = await approveAquaToSpendTokens({
@@ -112,15 +113,10 @@ export async function shipAquaStrategy({
 	});
 	await waitForTransactionReceipt(walletClient, { hash: approvalTxHashToken1 });
 
-	const approvalHashes: [Hex, Hex] = [
-		approvalTxHashToken0,
-		approvalTxHashToken1,
-	];
-
-	const shipTx = await buildAquaStrategy({
+	const { shipTx, strategy } = await buildAquaStrategy({
 		maker: account.address,
 		walletClient,
-		liquidityProvision: toLiquidityProvision(allocation),
+		liquidityProvision,
 	});
 
 	const hash = await walletClient.sendTransaction({
@@ -134,11 +130,12 @@ export async function shipAquaStrategy({
 	const receipt = await waitForTransactionReceipt(walletClient, { hash });
 
 	return {
-		approvalHashes,
+		approvalHashes: [approvalTxHashToken0, approvalTxHashToken1],
 		shipped: {
 			sleeve: allocation.sleeve,
 			hash,
 			receipt,
+			strategy,
 		},
 	};
 }
@@ -189,15 +186,15 @@ export function toLiquidityProvision(
 	];
 }
 
-export interface ShipAquaPortfolioInput {
+export type ShipAquaPortfolioInput = {
 	walletClient: WalletClient;
 	allocations: PairAllocation[];
-}
+};
 
-export interface ShipAquaPortfolioResult {
+export type ShipAquaPortfolioResult = {
 	approvalHashes: Hex[];
 	shipped: ShippedStrategy[];
-}
+};
 
 export async function shipAquaPortfolio({
 	walletClient,
@@ -206,14 +203,14 @@ export async function shipAquaPortfolio({
 	const approvalHashes: Hex[] = [];
 	const shipped: ShippedStrategy[] = [];
 
-	allocations.map(async (allocation) => {
+	for (const allocation of allocations) {
 		const result = await shipAquaStrategy({
 			walletClient,
 			allocation,
 		});
 		approvalHashes.push(...result.approvalHashes);
 		shipped.push(result.shipped);
-	});
+	}
 
 	return {
 		approvalHashes,

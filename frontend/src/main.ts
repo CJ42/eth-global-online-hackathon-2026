@@ -1,15 +1,10 @@
+import { parseEther, parseUnits } from "viem";
+import { maker } from "@/config";
 import {
-	createTestClient,
-	http,
-	parseEther,
-	parseUnits,
-	publicActions,
-	walletActions,
-} from "viem";
-import { robinhood } from "viem/chains";
-
-import { LOCALHOST_RPC_URL, maker } from "@/config";
-import { distributeInitialTokens, logTokenBalances } from "@/lib/utils";
+	distributeInitialTokens,
+	logTokenBalances,
+	robinhoodForkClient,
+} from "./app/api/fork";
 import {
 	buildPortfolioAllocations,
 	FIXED_TOKEN_PRICES_USD,
@@ -29,28 +24,34 @@ import { shipAquaPortfolio } from "./lib/strategy";
 // - 1 TSLA 	=   350.00$
 
 async function main() {
-	// 1. fund some initial tokens to liquidity provider (just a lot to get started)
-	await distributeInitialTokens("USDG", maker, parseUnits("10000", 6));
-	await distributeInitialTokens("WETH", maker, parseEther("1"));
-	await distributeInitialTokens("ONEINCH", maker, parseUnits("10000", 18));
-	await distributeInitialTokens("TSLA", maker, parseUnits("100", 18));
+	await distributeInitialTokens({
+		tokenSymbol: "USDG",
+		recipient: maker,
+		amount: parseUnits("10000", 6),
+	});
+	await distributeInitialTokens({
+		tokenSymbol: "WETH",
+		recipient: maker,
+		amount: parseEther("1"),
+	});
+	await distributeInitialTokens({
+		tokenSymbol: "ONEINCH",
+		recipient: maker,
+		amount: parseUnits("10000", 18),
+	});
+	await distributeInitialTokens({
+		tokenSymbol: "TSLA",
+		recipient: maker,
+		amount: parseUnits("100", 18),
+	});
 	await logTokenBalances("after", maker);
 
-	// 2. impersonate liquidity provider on Robinhood mainnet
-	// + connect to anvil fork running for Robinhood
-	const testClient = createTestClient({
-		account: maker,
-		chain: robinhood,
-		mode: "anvil",
-		transport: http(LOCALHOST_RPC_URL),
-	})
-		.extend(publicActions)
-		.extend(walletActions);
+	await robinhoodForkClient.setBalance({
+		address: maker,
+		value: parseEther("1"),
+	});
+	await robinhoodForkClient.impersonateAccount({ address: maker });
 
-	await testClient.setBalance({ address: maker, value: parseEther("1") });
-	await testClient.impersonateAccount({ address: maker });
-
-	// 3. calculate Conservative portfolio allocations from fixed prices
 	const { allocations } = buildPortfolioAllocations({
 		totalUsd: 1000,
 		weights: PROFILE_WEIGHTS.conservative,
@@ -59,9 +60,8 @@ async function main() {
 
 	console.log("📦 Portfolio allocations:", allocations);
 
-	// 4. approve and ship all three Aqua strategies
 	const result = await shipAquaPortfolio({
-		walletClient: testClient,
+		walletClient: robinhoodForkClient,
 		allocations,
 	});
 

@@ -14,15 +14,16 @@ import {
 	strategyHashFromEvents,
 } from "@/lib/ship";
 import { shipAquaPortfolio } from "@/lib/strategy";
-import { robinhoodForkClient } from "../fork";
+import { fundMakerInventory, robinhoodForkClient } from "../fork";
 
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
 		const { profile } = parseShipPortfolioRequest(body);
 
+		await fundMakerInventory();
+
 		await robinhoodForkClient.impersonateAccount({ address: maker });
-		// Fork demos: ensure gas for repeated ships without restarting Anvil.
 		await robinhoodForkClient.setBalance({
 			address: maker,
 			value: parseEther("1"),
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
 				sleeve: shipped.sleeve,
 				txHash: shipped.hash,
 				strategyHash: strategyHashFromEvents(events),
+				strategy: shipped.strategy,
 				events,
 			});
 		}

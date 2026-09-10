@@ -1,24 +1,45 @@
-# Next.js UI
+# Aqua Portfolio Manager
 
-To install dependencies:
+## Getting Started
+
+1. install dependencies
 
 ```bash
 bun install
 ```
 
-To start a development server:
+2. Start a local chain fork of Robinhood chain (Anvil Robinhood fork on `http://127.0.0.1:8545`, chain id `4663`)
 
 ```bash
-bun dev
+bun run chain:start
 ```
 
-To run for production:
+3. Run UI website locally
 
 ```bash
-bun start
+bun run dev
 ```
 
-This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+## Demo user flow
+
+MetaMask → add network Robinhood Anvil Fork (`4663`, RPC `http://127.0.0.1:8545`)
+
+Flow:
+1. Select a risk profile → **Deploy strategies** (`POST /api/ship` ships three Aqua XYC strategies; maker inventory is auto-funded).
+2. After ship succeeds, the **Taker swap** panel appears.
+3. Click **Connect MetaMask & swap 10 USDG**:
+   - backend funds the connected address with gas + 10 USDG (`POST /api/taker/fund`)
+   - MetaMask signs USDG approve → AquaSwapVMRouter
+   - MetaMask signs SwapVM `swap()` against the low-risk USDG/WETH strategy
+4. UI shows swap tx hash, `Swapped` / `Pulled` / `Pushed`, and ERC-20 `Transfer` evidence.
+
+Offline smoke (no MetaMask): `bun run smoke:taker-swap`
+
+Key code pointers:
+- Ship + encoded strategy: [`src/lib/strategy.ts`](src/lib/strategy.ts), [`src/app/api/ship/route.ts`](src/app/api/ship/route.ts)
+- Taker fund: [`src/app/api/taker/fund/route.ts`](src/app/api/taker/fund/route.ts), [`src/app/api/fork.ts`](src/app/api/fork.ts)
+- Quote / swap / receipt decode: [`src/lib/swap.ts`](src/lib/swap.ts)
+- MetaMask UI: [`src/feature/TakerSwap/TakerSwapPanel.tsx`](src/feature/TakerSwap/TakerSwapPanel.tsx)
 
 # ☑️ Implementation List (roadmap)
 
@@ -30,11 +51,13 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 | Off-chain agent triggering switches     | ❌                            |
 | 3-strategy UI                           | ✅ visual only, not wired     |
 | Live chart vs Uniswap price             | ❌                            |
-| ➡️ **Taker swap (real token transfer)** | ❌                            |
+| ➡️ **Taker swap (real token transfer)** | ✅ MetaMask + SwapVM on fork |
 | FEEDBACK.md (Uniswap hard requirement)  | ⏸️  **Paused until knowing what to implement**                          |
 
 **MUST HAVE!**
-- [ ] **1inch requirement** Implement simulation to transfer tokens, a real taker swap. Should simulate a taker order (a taker swapping through SwapVM).
+- [x] **1inch requirement** Implement simulation to transfer tokens, a real taker swap. Should simulate a taker order (a taker swapping through SwapVM).
+
+
 
 **Mock vs. no-mock**
 ✅ OK to mock: anvil fork of Robinhood chain, whale-impersonation funding, TSLA price (no Uniswap market exists for it — just label it), canned demo amounts, pre-recorded backup video.
@@ -44,13 +67,13 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 
 - [x] Make the dashboard that allows to select among the three different strategies available
 
-- [ ] **🟪 In Review** Make the "Select" button in the UI to implement a real `ship()` flow that interact with the Robinhood local chain fork (via some backend). Should re-use same logic flow as within `main.ts`
+- [x] **🟩 Done** - Make the "Select" button in the UI to implement a real `ship()` flow that interact with the Robinhood local chain fork (via some backend). Should re-use same logic flow as within `main.ts`
   - [x] it should change the amounts selected based on the strategy picked. It should build the amounts for the 3 x strategies. 
   - [x] a final "Ship" button (or a more UI / UX friendly word) ship the strategy and generate the on-chain transaction.
   - [x] Should call a backend API route created + show that ship was executed show the tx hash for Robinhood + [listen to some events from the `Aqua.sol` contract](https://github.com/1inch/aqua/blob/9c5c42e5840e8741fba3597c48456c9510212b66/src/interfaces/IAqua.sol#L40-L51)
   - [x] Ideally, I want to visualise the strategy shipped to Aqua in the UI.
 
-- [x] Keep the wallet server-side and expose only its address through `GET /api/wallet`
+- [x] **🟩 Done** - Keep the wallet server-side and expose only its address through `GET /api/wallet`
 
 ## 📅 Wednesday
 - [ ] Allow to enter the input amount and it will calculate the split
@@ -66,7 +89,7 @@ This project was created using `bun init` in bun v1.3.3. [Bun](https://bun.com) 
 
 - **Tuesday 8th** 
   - ✅ prove ship() works end-to-end on the fork; 
-  - build the taker swap (this is the actual 1inch qualification bar); 
+  - ✅ build the taker swap (this is the actual 1inch qualification bar); 
   - ☑️ (**passing**) confirm Uniswap Trade API covers your target chain, grab API key.
 - **Wednesday 9th** 
   — build dock() + re-ship rebalancing; 

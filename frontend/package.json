@@ -3,12 +3,13 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"chain:start": "anvil --fork-url https://rpc.mainnet.chain.robinhood.com",
+		"chain:start": "anvil --fork-url https://rpc.mainnet.chain.robinhood.com --chain-id 3133731",
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "biome check .",
-		"format": "biome format --write ."
+		"format": "biome format --write .",
+		"smoke:taker-swap": "bun src/scripts/taker-swap-smoke.ts"
 	},
 	"dependencies": {
 		"@1inch/aqua-sdk": "^0.3.1",

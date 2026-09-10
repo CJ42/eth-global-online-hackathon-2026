@@ -1,0 +1,82 @@
+.card {
+	border-radius: 1.25rem;
+	border-color: rgb(16 24 40 / 10%);
+	box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 6%);
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	font-size: 0.875rem;
+	color: #475467;
+}
+
+.content strong {
+	color: #101828;
+}
+
+.content code {
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.75rem;
+	color: #101828;
+}
+
+.result {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.875rem;
+	border: 1px solid rgb(16 24 40 / 10%);
+	border-radius: 0.875rem;
+	background: #f8fafc;
+}
+
+.result ul {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding-left: 1rem;
+	list-style: disc;
+}
+
+.progress {
+	color: #475467;
+}
+
+.error {
+	color: #b42318;
+}
+
+.actions {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.button,
+.secondaryButton {
+	width: 100%;
+	height: 2.75rem;
+	border-radius: 0.625rem;
+}
+
+.button {
+	background: #101828;
+	color: white;
+}
+
+.button:hover {
+	background: #273346;
+}
+
+.secondaryButton {
+	border: 1px solid rgb(16 24 40 / 15%);
+	background: white;
+	color: #101828;
+}
+
+.secondaryButton:hover {
+	background: #f8fafc;
+}

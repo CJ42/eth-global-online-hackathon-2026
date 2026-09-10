@@ -48,6 +48,7 @@ export type ShippedSleeveResult = {
 	sleeve: SleeveId;
 	txHash: Hex;
 	strategyHash: Hex | null;
+	strategy: Hex;
 	events: AquaShipEvent[];
 };
 
