@@ -37,6 +37,11 @@ next-env.d.ts
 # vercel
 .vercel
 
+# cloudflare
+.open-next/
+.wrangler/
+cloudflare-env.d.ts
+
 # misc
 .DS_Store
 *.pem
