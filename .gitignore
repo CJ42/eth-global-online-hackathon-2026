@@ -1,39 +1,43 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
-/.pnp
+node_modules
+.pnp
 .pnp.js
 
-# testing
-/coverage
-
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build
+dist
+*.tgz
+robinhood-strategies.json
 
-# misc
-.DS_Store
-*.pem
+# testing
+coverage
+*.lcov
 
-# debug
+# logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
+# env
 .env
+.env*.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+next-env.d.ts
 
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# Initial file used for testing
-test.ts
+# misc
+.DS_Store
+*.pem
+.idea
