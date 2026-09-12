@@ -72,6 +72,8 @@ bun install
 bun run chain:start
 ```
 
+<!-- > **Note:** keep the `--gas-limit 30000000` flag when starting anvil (locally or on the VPS). Robinhood has a 2^50 block gas limit, while anvil ≥ 1.8 uses it as the default `gas` for `eth_sendTransaction`, so impersonated accounts fail with "Insufficient funds for gas * price + value". The fork client also estimates gas explicitly (see [`src/lib/anvilTransport.ts`](src/lib/anvilTransport.ts)) as a second safeguard. -->
+
 3. Run UI website locally
 
 ```bash
@@ -115,7 +117,7 @@ Key code pointers:
 **MUST HAVE!**
 - [x] **1inch requirement** Implement simulation to transfer tokens, a real taker swap. Should simulate a taker order (a taker swapping through SwapVM).
 
-
+****
 
 **Mock vs. no-mock**
 ✅ OK to mock: anvil fork of Robinhood chain, whale-impersonation funding, TSLA price (no Uniswap market exists for it — just label it), canned demo amounts, pre-recorded backup video.
@@ -146,16 +148,23 @@ Key code pointers:
 5. Prioritized 6-day plan
 
 - **Tuesday 8th** 
-  - ✅ prove ship() works end-to-end on the fork; 
-  - ✅ build the taker swap (this is the actual 1inch qualification bar); 
-  - ☑️ (**passing**) confirm Uniswap Trade API covers your target chain, grab API key.
+  - [x] prove ship() works end-to-end on the fork; 
+  - [x] build the taker swap (this is the actual 1inch qualification bar); 
+  - [x] (**skipped for now**) confirm Uniswap Trade API covers your target chain, grab API key.
 - **Wednesday 9th** 
-  — build dock() + re-ship rebalancing; 
-  - ✅ wire the UI's Select button to real API routes so it triggers real fork transactions.
-- **Thursday 10th** — Uniswap integration: live Trade API prices replacing the hardcoded ones; use a live price to calibrate the conservative sleeve's band.
-- **Friday 11th** — the money-shot: live chart comparing your SwapVM rate vs real Uniswap price. Write FEEDBACK.md, submit the Uniswap form, add a "for judges" README section with file/line pointers. Non-negotiable, don't defer.
-- **Saturday 12th** — polish, fix the small bugs above, record a backup demo video (fund → ship 3 → taker swap → switch profile → dock+re-ship → chart re-converges).
-- **Sunday 13th** — final README + submission, buffer for breakage.
+  — [ ] build dock() + re-ship rebalancing; 
+  - [x] wire the UI's Select button to real API routes so it triggers real fork transactions.
+- **Thursday 10th** 
+  - [ ] Uniswap integration: live Trade API prices replacing the hardcoded ones. Use a live price to calibrate the conservative sleeve's band.
+- **Friday 11th**
+  - [ ] live chart comparing your SwapVM rate vs real Uniswap price. 
+  - [ ] Write FEEDBACK.md, submit the Uniswap form, add a "for judges" README section with file/line pointers. Non-negotiable, don't defer.
+- **Saturday 12th** 
+  — [ ] polish, fix the small bugs above, 
+  - [ ] record a backup demo video (fund → ship 3 → taker swap → switch profile → dock+re-ship → chart re-converges).
+- **Sunday 13th** 
+  — [ ] final README + submission
+  - [ ] buffer for breakage
 
 ## References
 

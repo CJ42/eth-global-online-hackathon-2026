@@ -5,13 +5,12 @@ import {
 	formatEther,
 	formatUnits,
 	type Hex,
-	http,
 	parseEther,
 	parseUnits,
 	publicActions,
 	walletActions,
 } from "viem";
-import { ROBINHOOD_FORK_RPC_URL, maker, robinhoodFork } from "@/config";
+import { maker, ROBINHOOD_FORK_RPC_URL, robinhoodFork } from "@/config";
 import {
 	type AvailableWhaleTokens,
 	TOKEN_ADDRESS_BY_SYMBOL,
@@ -19,13 +18,14 @@ import {
 	TOKENIZED_STOCKS,
 	TOKENS,
 } from "@/constants";
+import { anvilHttp } from "@/lib/anvilTransport";
 import { TAKER_SWAP_AMOUNT_IN } from "@/lib/swap";
 
 export const robinhoodForkClient = createTestClient({
 	account: maker,
 	chain: robinhoodFork,
 	mode: "anvil",
-	transport: http(ROBINHOOD_FORK_RPC_URL),
+	transport: anvilHttp(ROBINHOOD_FORK_RPC_URL),
 })
 	.extend(publicActions)
 	.extend(walletActions);
