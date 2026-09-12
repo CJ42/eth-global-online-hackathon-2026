@@ -3,7 +3,9 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"chain:start": "anvil --fork-url https://rpc.mainnet.chain.robinhood.com --chain-id 1337 --gas-limit 30000000 --state robinhood-fork-state.json --state-interval 60",
+		"chain:start": "anvil --load-state robinhood-fork-snapshot.json --chain-id 1337 --gas-limit 30000000",
+		"chain:fork": "anvil --fork-url https://rpc.mainnet.chain.robinhood.com --chain-id 1337 --gas-limit 30000000",
+		"chain:snapshot": "bun src/scripts/fork-snapshot.ts",
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",

@@ -55,17 +55,31 @@ Maker wallet                    Aqua registry                 SwapVM router
 
 ## Pre-requisites
 
-**Required for judges:** run a local Anvil fork of Robinhood mainnet before using the app. Demo transactions stay on your machine instead of public Robinhood.
+**Required for judges:** run a local Anvil chain before using the app. Demo transactions stay on your machine instead of public Robinhood.
 
-- RPC: `http://localhost:8545` (fallback if the hosted RPC is unreachable)
-- Chain ID: `7357171`
+- RPC: `http://localhost:8545`
+- Chain ID: `1337`
 
 ```bash
 bun run chain:start
 ```
 
-Then add **Robinhood Anvil Fork** in your wallet (`7357171`, RPC `http://localhost:8545`).
+Then add **Robinhood Anvil Fork** in your wallet (`1337`, RPC `http://localhost:8545`).
 
+### Why a snapshot instead of a live fork
+
+`chain:start` loads [`robinhood-fork-snapshot.json`](robinhood-fork-snapshot.json), a state dump of a Robinhood mainnet fork that already contains the real Aqua registry, AquaSwapVMRouter, USDG / WETH / 1INCH / TSLA contracts and their whale balances. It runs standalone, with no upstream RPC.
+
+The public Robinhood RPC (`rpc.mainnet.chain.robinhood.com`) only serves state for roughly the last 10 minutes of blocks (block time is ~100 ms). A live `anvil --fork-url` pinned to an older block cannot load any account it has not already cached, and `ship()` / `swap()` then hang with `metadata is not found` in the Anvil log. A snapshot cannot go stale.
+
+To rebuild the snapshot from current mainnet state:
+
+```bash
+bun run chain:fork       # terminal 1: fresh live fork (valid ~10 minutes)
+bun run chain:snapshot   # terminal 2: warms the demo flow, writes robinhood-fork-snapshot.json
+```
+
+Then stop `chain:fork` and use `chain:start`. The hosted VPS Anvil behind the live demo URL must run in `chain:start` mode for the same reason.
 
 ## Getting Started
 
@@ -75,7 +89,7 @@ Then add **Robinhood Anvil Fork** in your wallet (`7357171`, RPC `http://localho
 bun install
 ```
 
-2. Start a local chain fork of Robinhood mainnet (Anvil on `http://localhost:8545`, chain id `7357171`)
+2. Start a local chain fork of Robinhood mainnet (Anvil on `http://localhost:8545`, chain id `1337`)
 
 ```bash
 bun run chain:start
@@ -91,7 +105,7 @@ bun run dev
 
 ## Demo user flow
 
-MetaMask → add network Robinhood Anvil Fork (`7357171`, RPC `http://localhost:8545`)
+MetaMask → add network Robinhood Anvil Fork (`1337`, RPC `http://localhost:8545`)
 
 Flow:
 1. Select a risk profile → **Deploy strategies** (`POST /api/ship` ships three Aqua XYC strategies; maker inventory is auto-funded).
@@ -103,6 +117,8 @@ Flow:
 4. UI shows swap tx hash, `Swapped` / `Pulled` / `Pushed`, and ERC-20 `Transfer` evidence.
 
 Offline smoke (no MetaMask): `bun run smoke:taker-swap`
+
+**Troubleshooting:** every `bun run chain:start` restarts from the snapshot, so MetaMask keeps balances and nonces from the previous chain instance. If balances look wrong or a transaction never confirms, open MetaMask → Settings → Advanced → **Clear activity tab data**, then claim test tokens again.
 
 Key code pointers:
 - Ship + encoded strategy: [`src/lib/strategy.ts`](src/lib/strategy.ts), [`src/app/api/ship/route.ts`](src/app/api/ship/route.ts)

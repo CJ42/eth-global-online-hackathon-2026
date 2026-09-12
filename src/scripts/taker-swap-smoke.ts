@@ -43,7 +43,7 @@ import {
 
 const taker = "0x1111111111111111111111111111111111111111" as const;
 
-async function main() {
+export async function runTakerSwapSmoke() {
 	console.log("1) Funding maker inventory…");
 	await fundMakerInventory();
 
@@ -163,7 +163,9 @@ async function main() {
 	console.log("✅ taker swap smoke passed");
 }
 
-main().catch((error) => {
-	console.error(error);
-	process.exit(1);
-});
+if (import.meta.main) {
+	runTakerSwapSmoke().catch((error) => {
+		console.error(error);
+		process.exit(1);
+	});
+}
