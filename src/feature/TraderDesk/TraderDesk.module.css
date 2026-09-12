@@ -1,0 +1,89 @@
+.root {
+	display: grid;
+	grid-template-columns: minmax(0, 22rem) minmax(0, 28rem);
+	align-items: start;
+	gap: 1.5rem;
+}
+
+.empty {
+	max-width: 32rem;
+	border-radius: 1.25rem;
+	border-color: rgb(16 24 40 / 10%);
+	box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 6%);
+}
+
+.cta {
+	height: 2.75rem;
+	border-radius: 0.625rem;
+	background: #101828;
+	color: white;
+}
+
+.cta:hover {
+	background: #273346;
+}
+
+.listTitle {
+	margin-bottom: 0.75rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #667085;
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.route {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.25rem;
+	width: 100%;
+	padding: 1rem 1.1rem;
+	border: 2px solid rgb(16 24 40 / 8%);
+	border-radius: 1rem;
+	background: white;
+	text-align: left;
+	cursor: pointer;
+}
+
+.route:hover {
+	border-color: rgb(16 24 40 / 20%);
+}
+
+.selected {
+	border-color: #101828;
+	box-shadow: 0 0 0 3px rgb(16 24 40 / 10%);
+}
+
+.routePair {
+	font-size: 1rem;
+	font-weight: 700;
+	color: #101828;
+}
+
+.routeMeta {
+	font-size: 0.8125rem;
+	color: #667085;
+}
+
+.route code {
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.75rem;
+	color: #475467;
+}
+
+@media (max-width: 900px) {
+	.root {
+		grid-template-columns: 1fr;
+		max-width: 32rem;
+	}
+}

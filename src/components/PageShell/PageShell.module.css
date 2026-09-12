@@ -1,6 +1,6 @@
 .main {
-	min-height: 100svh;
-	padding: 4.5rem 1.5rem 3rem;
+	min-height: calc(100svh - 4rem);
+	padding: 2.5rem 1.5rem 3rem;
 	background:
 		radial-gradient(circle at 92% 4%, rgb(194 232 239 / 32%), transparent 28rem),
 		#fff;
@@ -42,9 +42,22 @@
 	line-height: 1.65;
 }
 
+.compact {
+	margin-bottom: 1.75rem;
+}
+
+.compact .title {
+	font-size: clamp(1.75rem, 4vw, 2.75rem);
+	line-height: 1.1;
+}
+
+.compact .subtitle {
+	margin-top: 0.75rem;
+}
+
 @media (max-width: 640px) {
 	.main {
-		padding: 3rem 1rem 2rem;
+		padding: 1.75rem 1rem 2rem;
 	}
 
 	.header {

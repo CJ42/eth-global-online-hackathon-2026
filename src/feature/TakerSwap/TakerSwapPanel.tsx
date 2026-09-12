@@ -21,6 +21,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { ROBINHOOD_FORK_RPC_URL, robinhoodFork, SWAP_VM_ROUTER } from "@/config";
+import { useWallet } from "@/hooks/useWallet";
 import {
 	buildTakerQuoteTx,
 	buildTakerSwapTx,
@@ -31,16 +32,19 @@ import {
 	TAKER_TOKEN_IN,
 	type TakerSwapQuote,
 } from "@/lib/swap";
+import {
+	ensureRobinhoodNetwork,
+	getEthereumProvider,
+	shortenAddress,
+} from "@/lib/wallet";
 import { type FundTakerResult, fundTaker, requestFaucet } from "./api";
 import styles from "./TakerSwap.module.css";
-
-type EthereumProvider = {
-	request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-};
 
 type TakerSwapPanelProps = {
 	strategy: Hex;
 	strategyHash: Hex | null;
+	pairLabel?: string;
+	canSwap?: boolean;
 };
 
 type SwapResultView = {
@@ -49,54 +53,30 @@ type SwapResultView = {
 	decoded: DecodedTakerSwap;
 };
 
-declare global {
-	interface Window {
-		ethereum?: EthereumProvider;
-	}
-}
-
-const FORK_CHAIN_ID_HEX = `0x${robinhoodFork.id.toString(16)}`;
-
 export function TakerSwapPanel({
 	strategy,
 	strategyHash,
+	pairLabel = "USDG / WETH",
+	canSwap = true,
 }: TakerSwapPanelProps) {
-	const [taker, setTaker] = useState<Address | null>(null);
+	const { address: taker, isConnecting, connect } = useWallet();
 	const [funding, setFunding] = useState<FundTakerResult | null>(null);
 	const [faucetOk, setFaucetOk] = useState(false);
 	const [quote, setQuote] = useState<TakerSwapQuote | null>(null);
 	const [result, setResult] = useState<SwapResultView | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState<string | null>(null);
-	const [busyAction, setBusyAction] = useState<
-		"connect" | "faucet" | "swap" | null
-	>(null);
+	const [busyAction, setBusyAction] = useState<"faucet" | "swap" | null>(null);
 
-	const isBusy = busyAction !== null;
+	const isBusy = busyAction !== null || isConnecting;
 
 	async function handleConnect() {
 		if (isBusy) return;
 
 		setError(null);
-		setBusyAction("connect");
-
 		try {
-			const provider = getEthereumProvider();
-			await ensureRobinhoodNetwork(provider);
-
-			setStatus("Connecting MetaMask…");
-			const accounts = (await provider.request({
-				method: "eth_requestAccounts",
-			})) as string[];
-			const account = accounts[0] as Address | undefined;
-			if (!account) throw new Error("No MetaMask account selected");
-
-			setTaker(account);
-			setFunding(null);
-			setFaucetOk(false);
-			setQuote(null);
-			setResult(null);
-			setStatus(`Connected ${shorten(account)}`);
+			await connect();
+			setStatus("Wallet connected");
 		} catch (connectError) {
 			setStatus(null);
 			setError(
@@ -104,8 +84,6 @@ export function TakerSwapPanel({
 					? connectError.message
 					: "Failed to connect wallet",
 			);
-		} finally {
-			setBusyAction(null);
 		}
 	}
 
@@ -147,7 +125,7 @@ export function TakerSwapPanel({
 	}
 
 	async function handleSwap() {
-		if (isBusy) return;
+		if (isBusy || !canSwap) return;
 		if (!taker) {
 			setError("Connect a wallet first");
 			return;
@@ -171,7 +149,7 @@ export function TakerSwapPanel({
 				transport: http(ROBINHOOD_FORK_RPC_URL),
 			});
 
-			setStatus("Quoting USDG → WETH against the low-risk strategy…");
+			setStatus(`Quoting USDG → WETH against ${pairLabel}…`);
 			const quoteTx = buildTakerQuoteTx({ strategy });
 			const simulation = await publicClient.call({
 				account: taker,
@@ -232,11 +210,11 @@ export function TakerSwapPanel({
 	return (
 		<Card className={styles.card}>
 			<CardHeader>
-				<CardTitle>Taker swap (1inch qualification)</CardTitle>
+				<CardTitle>Swap {pairLabel}</CardTitle>
 				<CardDescription>
-					1) Connect MetaMask on the local fork. 2) Faucet ETH + 10 USDG to that
-					wallet. 3) Approve and swap USDG → WETH against the shipped low-risk
-					Aqua strategy.
+					{canSwap
+						? "Connect your wallet, get test funds, then swap 10 USDG → WETH."
+						: "This route is listed from the shipped SwapVM strategy. Live swap is only wired for USDG / WETH right now."}
 				</CardDescription>
 			</CardHeader>
 			<CardContent className={styles.content}>
@@ -246,12 +224,12 @@ export function TakerSwapPanel({
 				{strategyHash ? (
 					<p>
 						Strategy hash{" "}
-						<code title={strategyHash}>{shorten(strategyHash)}</code>
+						<code title={strategyHash}>{shortenAddress(strategyHash)}</code>
 					</p>
 				) : null}
 				{taker ? (
 					<p>
-						Connected <code title={taker}>{shorten(taker)}</code>
+						Connected <code title={taker}>{shortenAddress(taker)}</code>
 					</p>
 				) : (
 					<p>Wallet not connected</p>
@@ -261,7 +239,7 @@ export function TakerSwapPanel({
 					<p>
 						USDG funded{" "}
 						<code title={funding.usdgTransferHash}>
-							{shorten(funding.usdgTransferHash)}
+							{shortenAddress(funding.usdgTransferHash)}
 						</code>
 					</p>
 				) : null}
@@ -276,7 +254,7 @@ export function TakerSwapPanel({
 					<div className={styles.result}>
 						<p>
 							Swap tx{" "}
-							<code title={result.txHash}>{shorten(result.txHash)}</code>
+							<code title={result.txHash}>{shortenAddress(result.txHash)}</code>
 						</p>
 						{result.decoded.swapped ? (
 							<p>{result.decoded.swapped.message}</p>
@@ -316,15 +294,17 @@ export function TakerSwapPanel({
 			</CardContent>
 			<CardFooter>
 				<div className={styles.actions}>
-					<Button
-						type="button"
-						variant="outline"
-						className={styles.secondaryButton}
-						disabled={isBusy}
-						onClick={handleConnect}
-					>
-						{busyAction === "connect" ? "Connecting…" : "1. Connect wallet"}
-					</Button>
+					{taker ? null : (
+						<Button
+							type="button"
+							variant="outline"
+							className={styles.secondaryButton}
+							disabled={isBusy}
+							onClick={handleConnect}
+						>
+							{isConnecting ? "Connecting…" : "Connect wallet"}
+						</Button>
+					)}
 					<Button
 						type="button"
 						variant="outline"
@@ -332,56 +312,18 @@ export function TakerSwapPanel({
 						disabled={isBusy || !taker}
 						onClick={handleFaucet}
 					>
-						{busyAction === "faucet" ? "Funding…" : "2. Get funds (faucet)"}
+						{busyAction === "faucet" ? "Funding…" : "Get test funds"}
 					</Button>
 					<Button
 						type="button"
 						className={styles.button}
-						disabled={isBusy || !taker}
+						disabled={isBusy || !taker || !canSwap}
 						onClick={handleSwap}
 					>
-						{busyAction === "swap" ? "Swapping…" : "3. Swap 10 USDG"}
+						{busyAction === "swap" ? "Swapping…" : "Swap 10 USDG → WETH"}
 					</Button>
 				</div>
 			</CardFooter>
 		</Card>
 	);
-}
-
-function getEthereumProvider(): EthereumProvider {
-	if (!window.ethereum)
-		throw new Error("MetaMask is required. Install it and retry.");
-	return window.ethereum;
-}
-
-async function ensureRobinhoodNetwork(provider: EthereumProvider) {
-	const chainId = (await provider.request({ method: "eth_chainId" })) as string;
-	// if (chainId.toLowerCase() === FORK_CHAIN_ID_HEX.toLowerCase()) return;
-
-	try {
-		await provider.request({
-			method: "wallet_switchEthereumChain",
-			params: [{ chainId: FORK_CHAIN_ID_HEX }],
-		});
-	} catch {
-		await provider.request({
-			method: "wallet_addEthereumChain",
-			params: [
-				{
-					chainId: FORK_CHAIN_ID_HEX,
-					chainName: "Robinhood Anvil Fork",
-					nativeCurrency: {
-						name: "Ether",
-						symbol: "ETH",
-						decimals: 18,
-					},
-					rpcUrls: [ROBINHOOD_FORK_RPC_URL],
-				},
-			],
-		});
-	}
-}
-
-function shorten(value: string) {
-	return `${value.slice(0, 10)}…${value.slice(-8)}`;
 }

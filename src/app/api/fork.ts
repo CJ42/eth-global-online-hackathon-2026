@@ -86,7 +86,7 @@ export async function fundMakerInventory(): Promise<void> {
 	});
 }
 
-const FAUCET_ETH = parseEther("1");
+const FAUCET_ETH = parseEther("10");
 
 export async function fundNativeEth(address: Address): Promise<{
 	address: Address;

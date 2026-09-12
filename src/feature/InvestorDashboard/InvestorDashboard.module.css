@@ -1,0 +1,69 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.empty,
+.summary,
+.position {
+	border-radius: 1.25rem;
+	border-color: rgb(16 24 40 / 10%);
+	box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 6%);
+}
+
+.cta {
+	height: 2.75rem;
+	border-radius: 0.625rem;
+	background: #101828;
+	color: white;
+}
+
+.cta:hover {
+	background: #273346;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1.25rem;
+}
+
+.amounts {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	font-size: 0.95rem;
+}
+
+.amounts p {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
+	color: #475467;
+}
+
+.amounts strong {
+	color: #101828;
+	font-variant-numeric: tabular-nums;
+}
+
+.hash {
+	padding-top: 0.25rem;
+	border-top: 1px solid rgb(16 24 40 / 8%);
+	font-size: 0.8125rem;
+}
+
+.hash code {
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.75rem;
+	color: #101828;
+}
+
+@media (max-width: 900px) {
+	.grid {
+		grid-template-columns: 1fr;
+		max-width: 32rem;
+	}
+}

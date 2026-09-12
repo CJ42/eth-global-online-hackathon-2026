@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { strategyById } from "@/components/StrategyCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,8 +85,11 @@ export function ShipResultDialog({
 				</div>
 
 				<DialogFooter>
-					<Button type="button" onClick={() => onOpenChange(false)}>
-						Close
+					<Button asChild variant="outline">
+						<Link href="/investors">View positions</Link>
+					</Button>
+					<Button asChild>
+						<Link href="/traders">Go swap</Link>
 					</Button>
 				</DialogFooter>
 			</DialogContent>

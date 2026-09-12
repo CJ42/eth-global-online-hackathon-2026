@@ -5,6 +5,12 @@ export type RiskProfile = "conservative" | "balanced" | "aggressive";
 
 export type SleeveId = "low" | "medium" | "high";
 
+export const SLEEVE_LABELS = {
+	low: "USDG / WETH",
+	medium: "WETH / 1INCH",
+	high: "USDG / TSLA",
+} as const satisfies Record<SleeveId, string>;
+
 export const TOKEN_META = {
 	USDG: { symbol: "USDG", address: TOKENS.USDG },
 	WETH: { symbol: "WETH", address: TOKENS.WETH },
