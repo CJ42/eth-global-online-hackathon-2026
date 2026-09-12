@@ -1,7 +1,7 @@
 # Aqua Funds Manager - Submission for Eth Global Online Hackathon 2026
 
-> **Project name:** 💧 Aqua Funds Manager
-> **🔗 Live Demo URL:** https://eth-global-online-hackathon-2026.cavallerajean.workers.dev/
+> - **Project name:** 💧 Aqua Funds Manager
+> - **🔗 Live Demo URL:** [https://eth-global-online-hackathon-2026.cavallerajean.workers.dev/](https://eth-global-online-hackathon-2026.cavallerajean.workers.dev/)
 
 
 ## Project Overview
@@ -146,7 +146,10 @@ Key code pointers:
 
 **Mock vs. no-mock**
 ✅ OK to mock: anvil fork of Robinhood chain, whale-impersonation funding, TSLA price (no Uniswap market exists for it — just label it), canned demo amounts, pre-recorded backup video.
-🚫 Must be real: ship()/dock() txs against the official Aqua contract, an actual taker swap producing real ERC-20 transfers, live Uniswap Trade API calls at demo time (not a saved JSON), FEEDBACK.md + submitted form, and don't squash your commit history.
+
+(✅ Done) 🚫 Must be real: ship()/dock() txs against the official Aqua contract, an actual taker swap producing real ERC-20 transfers, 
+
+live Uniswap Trade API calls at demo time (not a saved JSON), FEEDBACK.md + submitted form, and don't squash your commit history.
 
 ## 📅 Tuesday
 
