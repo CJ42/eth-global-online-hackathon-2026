@@ -1,10 +1,16 @@
 import type { Address, Hex } from "viem";
+import type { FaucetAmounts } from "@/config";
 
 export type FundTakerResult = {
 	address: Address;
 	gasFunded: boolean;
-	usdgTransferHash: Hex;
-	usdgAmount: string;
+	amounts: FaucetAmounts;
+	transfers: {
+		USDG: Hex;
+		WETH: Hex;
+		ONEINCH: Hex;
+		TSLA: Hex;
+	};
 };
 
 export type FaucetResult = {

@@ -19,7 +19,7 @@ import {
 	robinhoodForkClient,
 } from "../app/api/fork";
 import {
-	FORK_RPC_URLS,
+	LOCAL_FORK_RPC_URL,
 	maker,
 	robinhoodFork,
 	SWAP_VM_ROUTER,
@@ -69,7 +69,7 @@ async function main() {
 	if (!low) throw new Error("low sleeve missing");
 	console.log("   low strategy ready:", low.hash);
 
-	console.log("3) Funding taker with 10 USDG…");
+	console.log("3) Funding taker with faucet amounts…");
 	await fundTakerForSwap(taker);
 	await robinhoodForkClient.impersonateAccount({ address: taker });
 	await robinhoodForkClient.setBalance({
@@ -80,7 +80,7 @@ async function main() {
 	const takerWallet = createWalletClient({
 		account: taker,
 		chain: robinhoodFork,
-		transport: fallback(FORK_RPC_URLS.map((url) => http(url))),
+		transport: http(robinhoodFork.rpcUrls.default.http[0]),
 	});
 
 	const usdgBefore = await robinhoodForkClient.readContract({

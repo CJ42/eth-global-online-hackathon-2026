@@ -1,0 +1,59 @@
+.card {
+	min-width: 0;
+	height: 100%;
+	padding: 1.25rem 1.35rem;
+	border: 1px solid rgb(16 24 40 / 10%);
+	border-radius: 1.25rem;
+	background: #f8fafc;
+	box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 4%);
+}
+
+.title {
+	margin-bottom: 0.5rem;
+	font-size: 1.15rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: #101828;
+}
+
+.body {
+	color: #475467;
+	font-size: 0.95rem;
+	line-height: 1.55;
+}
+
+.list {
+	margin: 0.75rem 0 1rem;
+	padding-left: 1.25rem;
+	color: #101828;
+	font-size: 0.95rem;
+	line-height: 1.7;
+	list-style: disc;
+}
+
+.button {
+	height: 2.5rem;
+	border-radius: 0.625rem;
+	background: #101828;
+	color: white;
+}
+
+.button:hover {
+	background: #273346;
+}
+
+.status {
+	margin-top: 0.75rem;
+	color: #475467;
+	font-size: 0.875rem;
+}
+
+.error {
+	margin-top: 0.75rem;
+	color: #b42318;
+	font-size: 0.875rem;
+}
+
+.import {
+	margin-top: 1rem;
+}

@@ -2,7 +2,7 @@ import {
 	type Address,
 	createTestClient,
 	erc20Abi,
-	fallback,
+	http,
 	formatEther,
 	formatUnits,
 	type Hex,
@@ -11,7 +11,7 @@ import {
 	publicActions,
 	walletActions,
 } from "viem";
-import { FORK_RPC_URLS, maker, robinhoodFork } from "@/config";
+import { FAUCET_AMOUNTS, maker, robinhoodFork } from "@/config";
 import {
 	type AvailableWhaleTokens,
 	TOKEN_ADDRESS_BY_SYMBOL,
@@ -19,14 +19,13 @@ import {
 	TOKENIZED_STOCKS,
 	TOKENS,
 } from "@/constants";
-import { anvilHttp } from "@/lib/anvilTransport";
-import { TAKER_SWAP_AMOUNT_IN } from "@/lib/swap";
+import { getTokenDecimals } from "@/lib/tokens";
 
 export const robinhoodForkClient = createTestClient({
 	account: maker,
 	chain: robinhoodFork,
 	mode: "anvil",
-	transport: fallback(FORK_RPC_URLS.map((url) => anvilHttp(url))),
+	transport: http(robinhoodFork.rpcUrls.default.http[0]),
 })
 	.extend(publicActions)
 	.extend(walletActions);
@@ -87,7 +86,8 @@ export async function fundMakerInventory(): Promise<void> {
 	});
 }
 
-const FAUCET_ETH = parseEther("10");
+const FAUCET_ETH = parseEther(FAUCET_AMOUNTS.ETH);
+const FAUCET_TOKEN_SYMBOLS = ["USDG", "WETH", "ONEINCH", "TSLA"] as const;
 
 export async function fundNativeEth(address: Address): Promise<{
 	address: Address;
@@ -106,21 +106,38 @@ export async function fundNativeEth(address: Address): Promise<{
 
 export async function fundTakerForSwap(taker: Address): Promise<{
 	gasFunded: boolean;
-	usdgTransferHash: Hex;
-	usdgAmount: string;
+	amounts: typeof FAUCET_AMOUNTS;
+	transfers: Record<(typeof FAUCET_TOKEN_SYMBOLS)[number], Hex>;
 }> {
 	await fundNativeEth(taker);
 
-	const usdgTransferHash = await distributeInitialTokens({
-		tokenSymbol: "USDG",
-		recipient: taker,
-		amount: TAKER_SWAP_AMOUNT_IN,
-	});
+	const transfers = {
+		USDG: await distributeInitialTokens({
+			tokenSymbol: "USDG",
+			recipient: taker,
+			amount: parseUnits(FAUCET_AMOUNTS.USDG, getTokenDecimals("USDG")),
+		}),
+		WETH: await distributeInitialTokens({
+			tokenSymbol: "WETH",
+			recipient: taker,
+			amount: parseUnits(FAUCET_AMOUNTS.WETH, getTokenDecimals("WETH")),
+		}),
+		ONEINCH: await distributeInitialTokens({
+			tokenSymbol: "ONEINCH",
+			recipient: taker,
+			amount: parseUnits(FAUCET_AMOUNTS.ONEINCH, getTokenDecimals("ONEINCH")),
+		}),
+		TSLA: await distributeInitialTokens({
+			tokenSymbol: "TSLA",
+			recipient: taker,
+			amount: parseUnits(FAUCET_AMOUNTS.TSLA, getTokenDecimals("TSLA")),
+		}),
+	};
 
 	return {
 		gasFunded: true,
-		usdgTransferHash,
-		usdgAmount: TAKER_SWAP_AMOUNT_IN.toString(),
+		amounts: FAUCET_AMOUNTS,
+		transfers,
 	};
 }
 

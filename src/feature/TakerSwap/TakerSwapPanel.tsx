@@ -21,7 +21,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { FORK_RPC_URLS, robinhoodFork, SWAP_VM_ROUTER } from "@/config";
+import { robinhoodFork, SWAP_VM_ROUTER } from "@/config";
 import { useWallet } from "@/hooks/useWallet";
 import {
 	buildTakerQuoteTx,
@@ -38,7 +38,6 @@ import {
 	getEthereumProvider,
 	shortenAddress,
 } from "@/lib/wallet";
-import { type FundTakerResult, fundTaker, requestFaucet } from "./api";
 import styles from "./TakerSwap.module.css";
 
 type TakerSwapPanelProps = {
@@ -61,13 +60,11 @@ export function TakerSwapPanel({
 	canSwap = true,
 }: TakerSwapPanelProps) {
 	const { address: taker, isConnecting, connect } = useWallet();
-	const [funding, setFunding] = useState<FundTakerResult | null>(null);
-	const [faucetOk, setFaucetOk] = useState(false);
 	const [quote, setQuote] = useState<TakerSwapQuote | null>(null);
 	const [result, setResult] = useState<SwapResultView | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState<string | null>(null);
-	const [busyAction, setBusyAction] = useState<"faucet" | "swap" | null>(null);
+	const [busyAction, setBusyAction] = useState<"swap" | null>(null);
 
 	const isBusy = busyAction !== null || isConnecting;
 
@@ -85,43 +82,6 @@ export function TakerSwapPanel({
 					? connectError.message
 					: "Failed to connect wallet",
 			);
-		}
-	}
-
-	async function handleFaucet() {
-		if (isBusy) return;
-		if (!taker) {
-			setError("Connect a wallet first");
-			return;
-		}
-
-		setError(null);
-		setBusyAction("faucet");
-
-		try {
-			const provider = getEthereumProvider();
-			await ensureRobinhoodNetwork(provider);
-
-			setStatus("Sending 1 ETH from faucet…");
-			await requestFaucet(taker);
-			setFaucetOk(true);
-
-			setStatus("Sending 10 USDG to the connected wallet…");
-			const funded = await fundTaker(taker);
-			setFunding(funded);
-
-			setStatus(
-				"Funded 1 ETH + 10 USDG. Check MetaMask balance, then run the swap.",
-			);
-		} catch (faucetError) {
-			setStatus(null);
-			setError(
-				faucetError instanceof Error
-					? faucetError.message
-					: "Failed to fund wallet",
-			);
-		} finally {
-			setBusyAction(null);
 		}
 	}
 
@@ -147,7 +107,7 @@ export function TakerSwapPanel({
 			});
 			const publicClient = createPublicClient({
 				chain: robinhoodFork,
-				transport: fallback(FORK_RPC_URLS.map((url) => http(url))),
+				transport: http(robinhoodFork.rpcUrls.default.http[0]),
 			});
 
 			setStatus(`Quoting USDG → WETH against ${pairLabel}…`);
@@ -214,7 +174,7 @@ export function TakerSwapPanel({
 				<CardTitle>Swap {pairLabel}</CardTitle>
 				<CardDescription>
 					{canSwap
-						? "Connect your wallet, get test funds, then swap 10 USDG → WETH."
+						? "Claim test funds on Home, then swap 10 USDG → WETH."
 						: "This route is listed from the shipped SwapVM strategy. Live swap is only wired for USDG / WETH right now."}
 				</CardDescription>
 			</CardHeader>
@@ -235,15 +195,6 @@ export function TakerSwapPanel({
 				) : (
 					<p>Wallet not connected</p>
 				)}
-				{faucetOk ? <p>Faucet ETH sent</p> : null}
-				{funding ? (
-					<p>
-						USDG funded{" "}
-						<code title={funding.usdgTransferHash}>
-							{shortenAddress(funding.usdgTransferHash)}
-						</code>
-					</p>
-				) : null}
 				{quote ? (
 					<p>
 						Quoted out: {formatUnits(quote.amountOut, 18)} WETH (min{" "}
@@ -306,15 +257,6 @@ export function TakerSwapPanel({
 							{isConnecting ? "Connecting…" : "Connect wallet"}
 						</Button>
 					)}
-					<Button
-						type="button"
-						variant="outline"
-						className={styles.secondaryButton}
-						disabled={isBusy || !taker}
-						onClick={handleFaucet}
-					>
-						{busyAction === "faucet" ? "Funding…" : "Get test funds"}
-					</Button>
 					<Button
 						type="button"
 						className={styles.button}

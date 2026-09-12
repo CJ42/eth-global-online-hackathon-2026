@@ -1,3 +1,4 @@
+import { ForkWalletActions } from "@/components/ForkWalletActions";
 import { PageShell } from "@/components/PageShell";
 import { InvestorDashboard } from "@/feature/InvestorDashboard";
 
@@ -8,6 +9,7 @@ export default function InvestorsPage() {
 			title="Your positions and amounts"
 			subtitle="See how your last deployed portfolio is split across the three Aqua liquidity sleeves."
 			compact
+			actions={<ForkWalletActions />}
 		>
 			<InvestorDashboard />
 		</PageShell>

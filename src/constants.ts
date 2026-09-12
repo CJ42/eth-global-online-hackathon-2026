@@ -38,7 +38,7 @@ export type AvailableTokens = "WETH" | "USDG" | "ONEINCH";
 export const TOKENS: Record<AvailableTokens, Address> = {
 	WETH: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
 	USDG: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
-	ONEINCH: "0x1755c2910c126ee1b0cf1e08a307dc9e787285a0",
+	ONEINCH: "0x1755C2910c126eE1b0CF1E08a307Dc9E787285a0",
 } as const;
 
 // Token whales holding large amounts of tokens
@@ -52,7 +52,8 @@ export const TOKEN_WHALE = {
 	// WETH: "0xA379bedcc2A237cab1021cc2A4744edfB6C42618",
 	ONEINCH: "0x3fbC2BeEEC0647AC3999c67bC4eA3A3dD6a4fB85",
 	// ONEINCH: "0x481787bBa8C56f801Db8bdb336844b771c011246",
-	TSLA: "0x2F4579Ca81717d3D61BF8b6f06571877Bbe54A07",
+	TSLA: "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+	// TSLA: "0x2F4579Ca81717d3D61BF8b6f06571877Bbe54A07",
 } as const satisfies Record<string, Address>;
 
 export type AvailableWhaleTokens = keyof typeof TOKEN_WHALE;

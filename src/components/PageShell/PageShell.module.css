@@ -15,8 +15,20 @@
 }
 
 .header {
-	max-width: 63rem;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1.5rem 2rem;
 	margin-bottom: 1.5rem;
+}
+
+.copy {
+	max-width: 63rem;
+}
+
+.actions {
+	flex: 0 0 auto;
+	margin-left: auto;
 }
 
 .eyebrow {
@@ -64,7 +76,13 @@
 	}
 
 	.header {
+		flex-direction: column;
 		margin-bottom: 2rem;
+	}
+
+	.actions {
+		margin-left: 0;
+		width: 100%;
 	}
 
 	.title {

@@ -1,5 +1,6 @@
 .notice {
-	max-width: 44rem;
+	min-width: 0;
+	height: 100%;
 	padding: 1.25rem 1.35rem;
 	border: 1px solid rgb(16 24 40 / 10%);
 	border-radius: 1.25rem;
@@ -66,4 +67,8 @@
 
 .copy:hover {
 	background: #eef2f6;
+}
+
+.networkAction {
+	margin-top: 1rem;
 }

@@ -1,15 +1,21 @@
+import { getAddress, numberToHex } from "viem";
 import {
-	FORK_RPC_URLS,
 	LOCAL_FORK_RPC_URL,
 	robinhoodFork,
 } from "@/config";
 
 export type EthereumProvider = {
-	request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+	request: (args: { method: string; params?: unknown }) => Promise<unknown>;
 	on?: (event: string, handler: (...args: unknown[]) => void) => void;
 	removeListener?: (event: string, handler: (...args: unknown[]) => void) => void;
 	isMetaMask?: boolean;
 	providers?: EthereumProvider[];
+};
+
+export type WatchableToken = {
+	address: string;
+	symbol: string;
+	decimals: number;
 };
 
 declare global {
@@ -18,17 +24,15 @@ declare global {
 	}
 }
 
-export const FORK_CHAIN_ID_HEX = `0x${robinhoodFork.id.toString(16)}`;
-
 const ROBINHOOD_NETWORK_PARAMS = {
-	chainId: FORK_CHAIN_ID_HEX,
+	chainId: numberToHex(robinhoodFork.id),
 	chainName: robinhoodFork.name,
 	nativeCurrency: {
 		name: "Ether",
 		symbol: "ETH",
 		decimals: 18,
 	},
-	rpcUrls: [...FORK_RPC_URLS],
+	rpcUrls: [LOCAL_FORK_RPC_URL],
 };
 
 export function getEthereumProvider(): EthereumProvider {
@@ -41,20 +45,38 @@ export function getEthereumProvider(): EthereumProvider {
 	return metamask ?? window.ethereum;
 }
 
+export async function watchToken(
+	provider: EthereumProvider,
+	token: WatchableToken,
+) {
+	await ensureRobinhoodNetwork(provider);
+
+	return provider.request({
+		method: "wallet_watchAsset",
+		params: {
+			type: "ERC20",
+			options: {
+				address: getAddress(token.address),
+				symbol: token.symbol,
+				decimals: token.decimals,
+			},
+		},
+	});
+}
+
 export async function ensureRobinhoodNetwork(provider: EthereumProvider) {
-	const chainId = (await provider.request({ method: "eth_chainId" })) as string;
-	if (chainId.toLowerCase() === FORK_CHAIN_ID_HEX.toLowerCase()) return;
+	await provider.request({ method: "eth_requestAccounts" });
+	if (await isOnRobinhoodFork(provider)) return;
+
+	const chainId = numberToHex(robinhoodFork.id);
 
 	try {
 		await provider.request({
 			method: "wallet_switchEthereumChain",
-			params: [{ chainId: FORK_CHAIN_ID_HEX }],
+			params: [{ chainId }],
 		});
 	} catch (switchError) {
 		if (isUserRejectedError(switchError)) throw switchError;
-		if (!isUnrecognizedChainError(switchError)) {
-			throw new Error(manualNetworkMessage());
-		}
 
 		try {
 			await provider.request({
@@ -65,7 +87,20 @@ export async function ensureRobinhoodNetwork(provider: EthereumProvider) {
 			if (isUserRejectedError(addError)) throw addError;
 			throw new Error(manualNetworkMessage());
 		}
+
+		await provider.request({
+			method: "wallet_switchEthereumChain",
+			params: [{ chainId }],
+		});
 	}
+
+	if (!(await isOnRobinhoodFork(provider)))
+		throw new Error(manualNetworkMessage());
+}
+
+async function isOnRobinhoodFork(provider: EthereumProvider) {
+	const chainId = String(await provider.request({ method: "eth_chainId" }));
+	return chainId.toLowerCase() === numberToHex(robinhoodFork.id).toLowerCase();
 }
 
 export function isUnrecognizedChainError(error: unknown) {
@@ -76,6 +111,12 @@ export function isUnrecognizedChainError(error: unknown) {
 		message.includes("unrecognized chain") ||
 		message.includes("unknown chain")
 	);
+}
+
+export function formatWalletError(error: unknown, fallback: string) {
+	if (isUserRejectedError(error)) return "Request cancelled.";
+	if (error instanceof Error && error.message) return error.message;
+	return fallback;
 }
 
 export function isUserRejectedError(error: unknown) {

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LOCAL_FORK_RPC_URL } from "@/config";
+import { AddRobinhoodNetworkButton } from "@/components/ForkWalletActions";
 import styles from "./LocalForkNotice.module.css";
 
-const CHAIN_START_COMMAND = "anvil --fork-url https://rpc.mainnet.chain.robinhood.com --chain-id 7357171 --gas-limit 30000000 --state robinhood-fork-state.json --state-interval 60";
+const CHAIN_START_COMMAND = `anvil --fork-url https://rpc.mainnet.chain.robinhood.com --chain-id 1337 --gas-limit 30000000 --state robinhood-fork-state.json --state-interval 60`;
 
 export function LocalForkNotice() {
 	const [copied, setCopied] = useState(false);
@@ -18,15 +18,19 @@ export function LocalForkNotice() {
 
 	return (
 		<aside className={styles.notice} aria-labelledby="local-fork-title">
-			<p className={styles.eyebrow}>Before you start</p>
 			<h2 id="local-fork-title" className={styles.title}>
-				Run a local Robinhood fork
+				Step 1 - Run a local Robinhood fork
 			</h2>
-			<p className={styles.body}>
-				Deploys and swaps talk to an Anvil fork of Robinhood mainnet, not the
-				public chain. Keep that fork on your machine so demo transactions stay
-				local. The app uses the hosted RPC first, then falls back to{" "}
-				<code>{LOCAL_FORK_RPC_URL}</code>.
+			<p>
+				To test this app, run a local fork of Robinhood mainnet via <code>anvil</code>.
+			</p>
+			<ol>
+				<li>1) Install <code>Foundry</code> to have <code>anvil</code></li>
+				<li>2) Open your terminal and run the following command</li>
+			</ol>
+			<p>
+			Keep it running on your machine so demo transactions stay
+			local.
 			</p>
 			<div className={styles.commandRow}>
 				<pre className={styles.command}>
@@ -40,6 +44,9 @@ export function LocalForkNotice() {
 				>
 					{copied ? "Copied" : "Copy"}
 				</Button>
+			</div>
+			<div className={styles.networkAction}>
+				<AddRobinhoodNetworkButton />
 			</div>
 		</aside>
 	);

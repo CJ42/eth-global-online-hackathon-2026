@@ -1,0 +1,1 @@
+export { ClaimTestFunds } from "./ClaimTestFunds";
