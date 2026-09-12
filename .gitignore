@@ -46,3 +46,6 @@ cloudflare-env.d.ts
 .DS_Store
 *.pem
 .idea
+
+# anvil fork
+robinhood-fork-state.json

@@ -1,0 +1,69 @@
+.notice {
+	max-width: 44rem;
+	padding: 1.25rem 1.35rem;
+	border: 1px solid rgb(16 24 40 / 10%);
+	border-radius: 1.25rem;
+	background: #f8fafc;
+	box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 4%);
+}
+
+.eyebrow {
+	margin-bottom: 0.4rem;
+	color: #475467;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.title {
+	margin-bottom: 0.5rem;
+	font-size: 1.15rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: #101828;
+}
+
+.body {
+	color: #475467;
+	font-size: 0.95rem;
+	line-height: 1.55;
+}
+
+.body code {
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.8125rem;
+	color: #101828;
+}
+
+.commandRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	margin-top: 1rem;
+}
+
+.command {
+	flex: 1 1 16rem;
+	margin: 0;
+	padding: 0.7rem 0.9rem;
+	border-radius: 0.75rem;
+	background: #101828;
+	color: #fff;
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.875rem;
+	overflow-x: auto;
+}
+
+.copy {
+	height: 2.5rem;
+	border-radius: 0.625rem;
+	border-color: rgb(16 24 40 / 15%);
+	background: white;
+	color: #101828;
+}
+
+.copy:hover {
+	background: #eef2f6;
+}

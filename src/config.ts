@@ -7,6 +7,11 @@ import { robinhood } from "viem/chains";
 /// CloudFlare tunnel needs to use an existing domain name from CloudFlare to generate a stable RPC URL
 /// Otherwise, the RPC URL is re-generated randomly every time anvil runs.
 export const ROBINHOOD_FORK_RPC_URL = "https://rpc.potatotipper.app";
+export const LOCAL_FORK_RPC_URL = "http://localhost:8545";
+export const FORK_RPC_URLS = [
+	ROBINHOOD_FORK_RPC_URL,
+	LOCAL_FORK_RPC_URL,
+] as const;
 export const FORK_CHAIN_ID = 7357171;
 
 // Distinct chain id (anvil --chain-id) so MetaMask treats the fork as a
@@ -17,7 +22,7 @@ export const robinhoodFork = defineChain({
 	id: FORK_CHAIN_ID,
 	name: "Robinhood Anvil Fork",
 	rpcUrls: {
-		default: { http: [ROBINHOOD_FORK_RPC_URL] },
+		default: { http: [...FORK_RPC_URLS] },
 	},
 });
 

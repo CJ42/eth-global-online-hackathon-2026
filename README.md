@@ -55,7 +55,16 @@ Maker wallet                    Aqua registry                 SwapVM router
 
 ## Pre-requisites
 
-This project runs as a fork of Robinhood on anvil. Run one using the following command below at step 2.
+**Required for judges:** run a local Anvil fork of Robinhood mainnet before using the app. Demo transactions stay on your machine instead of public Robinhood.
+
+- RPC: `http://localhost:8545` (fallback if the hosted RPC is unreachable)
+- Chain ID: `7357171`
+
+```bash
+bun run chain:start
+```
+
+Then add **Robinhood Anvil Fork** in your wallet (`7357171`, RPC `http://localhost:8545`).
 
 
 ## Getting Started
@@ -66,7 +75,7 @@ This project runs as a fork of Robinhood on anvil. Run one using the following c
 bun install
 ```
 
-2. Start a local chain fork of Robinhood chain (Anvil Robinhood fork on `http://127.0.0.1:8545`, chain id `4663`)
+2. Start a local chain fork of Robinhood mainnet (Anvil on `http://localhost:8545`, chain id `7357171`)
 
 ```bash
 bun run chain:start
@@ -82,7 +91,7 @@ bun run dev
 
 ## Demo user flow
 
-MetaMask → add network Robinhood Anvil Fork (`4663`, RPC `http://127.0.0.1:8545`)
+MetaMask → add network Robinhood Anvil Fork (`7357171`, RPC `http://localhost:8545`)
 
 Flow:
 1. Select a risk profile → **Deploy strategies** (`POST /api/ship` ships three Aqua XYC strategies; maker inventory is auto-funded).

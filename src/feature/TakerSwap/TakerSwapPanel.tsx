@@ -7,6 +7,7 @@ import {
 	createWalletClient,
 	custom,
 	erc20Abi,
+	fallback,
 	formatUnits,
 	type Hex,
 	http,
@@ -20,7 +21,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { ROBINHOOD_FORK_RPC_URL, robinhoodFork, SWAP_VM_ROUTER } from "@/config";
+import { FORK_RPC_URLS, robinhoodFork, SWAP_VM_ROUTER } from "@/config";
 import { useWallet } from "@/hooks/useWallet";
 import {
 	buildTakerQuoteTx,
@@ -146,7 +147,7 @@ export function TakerSwapPanel({
 			});
 			const publicClient = createPublicClient({
 				chain: robinhoodFork,
-				transport: http(ROBINHOOD_FORK_RPC_URL),
+				transport: fallback(FORK_RPC_URLS.map((url) => http(url))),
 			});
 
 			setStatus(`Quoting USDG → WETH against ${pairLabel}…`);

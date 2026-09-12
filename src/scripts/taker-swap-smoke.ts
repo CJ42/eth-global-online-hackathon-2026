@@ -7,6 +7,7 @@
 import {
 	createWalletClient,
 	erc20Abi,
+	fallback,
 	formatUnits,
 	http,
 	parseEther,
@@ -18,7 +19,7 @@ import {
 	robinhoodForkClient,
 } from "../app/api/fork";
 import {
-	ROBINHOOD_FORK_RPC_URL,
+	FORK_RPC_URLS,
 	maker,
 	robinhoodFork,
 	SWAP_VM_ROUTER,
@@ -79,7 +80,7 @@ async function main() {
 	const takerWallet = createWalletClient({
 		account: taker,
 		chain: robinhoodFork,
-		transport: http(ROBINHOOD_FORK_RPC_URL),
+		transport: fallback(FORK_RPC_URLS.map((url) => http(url))),
 	});
 
 	const usdgBefore = await robinhoodForkClient.readContract({

@@ -57,13 +57,22 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
 		try {
 			const provider = getEthereumProvider();
-			await ensureRobinhoodNetwork(provider);
 			const accounts = (await provider.request({
 				method: "eth_requestAccounts",
 			})) as string[];
 			const account = accounts[0] as Address | undefined;
-			if (!account) throw new Error("No MetaMask account selected");
+			if (!account) throw new Error("No wallet account selected");
 			setAddress(account);
+
+			try {
+				await ensureRobinhoodNetwork(provider);
+			} catch (networkError) {
+				setError(
+					networkError instanceof Error
+						? networkError.message
+						: "Connected, but this wallet could not switch to the Robinhood fork.",
+				);
+			}
 		} catch (connectError) {
 			const message =
 				connectError instanceof Error

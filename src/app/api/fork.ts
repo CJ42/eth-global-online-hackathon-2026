@@ -2,6 +2,7 @@ import {
 	type Address,
 	createTestClient,
 	erc20Abi,
+	fallback,
 	formatEther,
 	formatUnits,
 	type Hex,
@@ -10,7 +11,7 @@ import {
 	publicActions,
 	walletActions,
 } from "viem";
-import { maker, ROBINHOOD_FORK_RPC_URL, robinhoodFork } from "@/config";
+import { FORK_RPC_URLS, maker, robinhoodFork } from "@/config";
 import {
 	type AvailableWhaleTokens,
 	TOKEN_ADDRESS_BY_SYMBOL,
@@ -25,7 +26,7 @@ export const robinhoodForkClient = createTestClient({
 	account: maker,
 	chain: robinhoodFork,
 	mode: "anvil",
-	transport: anvilHttp(ROBINHOOD_FORK_RPC_URL),
+	transport: fallback(FORK_RPC_URLS.map((url) => anvilHttp(url))),
 })
 	.extend(publicActions)
 	.extend(walletActions);
