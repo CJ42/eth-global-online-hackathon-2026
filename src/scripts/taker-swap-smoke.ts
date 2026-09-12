@@ -18,7 +18,7 @@ import {
 	robinhoodForkClient,
 } from "../app/api/fork";
 import {
-	LOCALHOST_RPC_URL,
+	ROBINHOOD_FORK_RPC_URL,
 	maker,
 	robinhoodFork,
 	SWAP_VM_ROUTER,
@@ -79,7 +79,7 @@ async function main() {
 	const takerWallet = createWalletClient({
 		account: taker,
 		chain: robinhoodFork,
-		transport: http(LOCALHOST_RPC_URL),
+		transport: http(ROBINHOOD_FORK_RPC_URL),
 	});
 
 	const usdgBefore = await robinhoodForkClient.readContract({

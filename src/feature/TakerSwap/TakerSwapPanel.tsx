@@ -20,7 +20,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { LOCALHOST_RPC_URL, robinhoodFork, SWAP_VM_ROUTER } from "@/config";
+import { ROBINHOOD_FORK_RPC_URL, robinhoodFork, SWAP_VM_ROUTER } from "@/config";
 import {
 	buildTakerQuoteTx,
 	buildTakerSwapTx,
@@ -168,7 +168,7 @@ export function TakerSwapPanel({
 			});
 			const publicClient = createPublicClient({
 				chain: robinhoodFork,
-				transport: http(LOCALHOST_RPC_URL),
+				transport: http(ROBINHOOD_FORK_RPC_URL),
 			});
 
 			setStatus("Quoting USDG → WETH against the low-risk strategy…");
@@ -375,7 +375,7 @@ async function ensureRobinhoodNetwork(provider: EthereumProvider) {
 						symbol: "ETH",
 						decimals: 18,
 					},
-					rpcUrls: [LOCALHOST_RPC_URL],
+					rpcUrls: [ROBINHOOD_FORK_RPC_URL],
 				},
 			],
 		});

@@ -3,17 +3,21 @@ import { AQUA_SWAP_VM_CONTRACT_ADDRESSES } from "@1inch/swap-vm-sdk";
 import { defineChain } from "viem";
 import { robinhood } from "viem/chains";
 
-export const LOCALHOST_RPC_URL = "http://127.0.0.1:8545";
+/// @dev I am running a Cloudflare tunnel to expose the local Robinhood fork running on anvil
+/// CloudFlare tunnel needs to use an existing domain name from CloudFlare to generate a stable RPC URL
+/// Otherwise, the RPC URL is re-generated randomly every time anvil runs.
+export const ROBINHOOD_FORK_RPC_URL = "https://rpc.potatotipper.app";
+export const FORK_CHAIN_ID = 7357171;
 
 // Distinct chain id (anvil --chain-id) so MetaMask treats the fork as a
 // custom network instead of merging it with the built-in Robinhood entry
 // (which would silently route reads/txs to the public Robinhood RPC).
 export const robinhoodFork = defineChain({
 	...robinhood,
-	id: 3133731,
+	id: FORK_CHAIN_ID,
 	name: "Robinhood Anvil Fork",
 	rpcUrls: {
-		default: { http: [LOCALHOST_RPC_URL] },
+		default: { http: [ROBINHOOD_FORK_RPC_URL] },
 	},
 });
 

@@ -11,7 +11,7 @@ import {
 	publicActions,
 	walletActions,
 } from "viem";
-import { LOCALHOST_RPC_URL, maker, robinhoodFork } from "@/config";
+import { ROBINHOOD_FORK_RPC_URL, maker, robinhoodFork } from "@/config";
 import {
 	type AvailableWhaleTokens,
 	TOKEN_ADDRESS_BY_SYMBOL,
@@ -25,7 +25,7 @@ export const robinhoodForkClient = createTestClient({
 	account: maker,
 	chain: robinhoodFork,
 	mode: "anvil",
-	transport: http(LOCALHOST_RPC_URL),
+	transport: http(ROBINHOOD_FORK_RPC_URL),
 })
 	.extend(publicActions)
 	.extend(walletActions);
