@@ -1,15 +1,18 @@
-# Eth Global Online Hackathon 2026
+# Aqua Funds Manager - Submission for Eth Global Online Hackathon 2026
 
-> **Project name:** 💧 Aqua Portfolio Manager
+> **Project name:** 💧 Aqua Funds Manager
+> **🔗 Live Demo URL:** https://eth-global-online-hackathon-2026.cavallerajean.workers.dev/
 
 
 ## Project Overview
 
-Building an Aqua App with Swap VM opcodes for portfolio management, balancing liquidity between different portfolio management strategies. Funds are rebalanced automatically between liquidity pools for the liquidity provider.
+An Aqua App that allows a liquidity provider to manage its positions and liquidity allocations using Swap VM opcodes programs.
+
+The integration with 1inch is built in a way to re-balance funds liquidity between different portfolio management strategies.
 
 **Stack used:**
 - 1inch Aqua + Swap VM SDK
-- anvil fork of Robinhood chain
+- anvil fork of Robinhood chain running on self hosted VPS, exposed via Cloudflare tunnel
 
 ### Liquidity profiles
 
