@@ -17,6 +17,7 @@ import styles from "./ShipStrategy.module.css";
 type ShipConfirmPanelProps = {
 	profile: RiskProfile;
 	isShipping: boolean;
+	step: string | null;
 	error: string | null;
 	onShip: () => void;
 };
@@ -30,6 +31,7 @@ const liquidityPairs = [
 export function ShipConfirmPanel({
 	profile,
 	isShipping,
+	step,
 	error,
 	onShip,
 }: ShipConfirmPanelProps) {
@@ -42,7 +44,8 @@ export function ShipConfirmPanel({
 				<CardTitle>Confirm funds allocation</CardTitle>
 				<CardDescription>
 					Ship a fixed ${FIXED_SHIP_TOTAL_USD.toLocaleString()} allocation
-					across three Aqua strategies on the local Robinhood fork.
+					across three Aqua strategies. Confirm each approval and ship in your
+					connected wallet.
 				</CardDescription>
 			</CardHeader>
 			<CardContent className={styles.confirmContent}>
@@ -72,7 +75,7 @@ export function ShipConfirmPanel({
 
 				{isShipping ? (
 					<p className={styles.progress} aria-live="polite">
-						Approving tokens and shipping three Aqua strategies…
+						{step ?? "Approving tokens and shipping three Aqua strategies…"}
 					</p>
 				) : null}
 

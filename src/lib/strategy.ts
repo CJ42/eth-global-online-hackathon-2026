@@ -84,9 +84,11 @@ export async function buildAquaStrategy({
 export async function shipAquaStrategy({
 	walletClient,
 	allocation,
+	onStep,
 }: {
 	walletClient: WalletClient;
 	allocation: PairAllocation;
+	onStep?: (message: string) => void;
 }): Promise<{ approvalHashes: Hex[]; shipped: ShippedStrategy }> {
 	const account = walletClient.account;
 	if (!account) throw new Error("walletClient account is required");
@@ -99,6 +101,7 @@ export async function shipAquaStrategy({
 	const addressToken1 = liquidityProvision[1].token.toString() as EvmAddress;
 	const amountToken1 = liquidityProvision[1].amount;
 
+	onStep?.(`Approve ${allocation.legs[0].token.symbol} in your wallet…`);
 	const approvalTxHashToken0 = await approveAquaToSpendTokens({
 		walletClient,
 		token: addressToken0,
@@ -106,6 +109,7 @@ export async function shipAquaStrategy({
 	});
 	await waitForTransactionReceipt(walletClient, { hash: approvalTxHashToken0 });
 
+	onStep?.(`Approve ${allocation.legs[1].token.symbol} in your wallet…`);
 	const approvalTxHashToken1 = await approveAquaToSpendTokens({
 		walletClient,
 		token: addressToken1,
@@ -119,6 +123,7 @@ export async function shipAquaStrategy({
 		liquidityProvision,
 	});
 
+	onStep?.("Confirm shipping this strategy in your wallet…");
 	const hash = await walletClient.sendTransaction({
 		account,
 		chain: walletClient.chain,

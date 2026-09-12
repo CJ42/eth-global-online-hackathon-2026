@@ -1,28 +1,79 @@
-import type { RiskProfile } from "@/lib/portfolio";
-import type { ShipPortfolioResult } from "@/lib/ship";
+import {
+	type Address,
+	createWalletClient,
+	custom,
+	fallback,
+	type Hex,
+	http,
+	publicActions,
+} from "viem";
+import { LOCAL_FORK_RPC_URL, robinhoodFork } from "@/config";
+import {
+	buildPortfolioAllocations,
+	FIXED_TOKEN_PRICES_USD,
+	PROFILE_WEIGHTS,
+	type RiskProfile,
+	SLEEVE_LABELS,
+} from "@/lib/portfolio";
+import {
+	decodeAquaShipEvents,
+	FIXED_SHIP_TOTAL_USD,
+	type ShipPortfolioResult,
+	type ShippedSleeveResult,
+	strategyHashFromEvents,
+} from "@/lib/ship";
+import { shipAquaStrategy } from "@/lib/strategy";
+import {
+	ensureRobinhoodNetwork,
+	getEthereumProvider,
+} from "@/lib/wallet";
 
 export async function shipPortfolio(
 	profile: RiskProfile,
+	address: Address,
+	onStep?: (message: string) => void,
 ): Promise<ShipPortfolioResult> {
-	const response = await fetch("/api/ship", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({ profile }),
+	const provider = getEthereumProvider();
+	onStep?.("Switching wallet to the Robinhood fork…");
+	await ensureRobinhoodNetwork(provider);
+
+	const walletClient = createWalletClient({
+		account: address,
+		chain: robinhoodFork,
+		transport: fallback([custom(provider), http(LOCAL_FORK_RPC_URL)]),
+	}).extend(publicActions);
+
+	const { allocations } = buildPortfolioAllocations({
+		totalUsd: FIXED_SHIP_TOTAL_USD,
+		weights: PROFILE_WEIGHTS[profile],
+		prices: FIXED_TOKEN_PRICES_USD,
 	});
 
-	const payload = (await response.json()) as
-		| ShipPortfolioResult
-		| { error?: string };
+	const approvalHashes: Hex[] = [];
+	const sleeves: ShippedSleeveResult[] = [];
 
-	if (!response.ok) {
-		throw new Error(
-			"error" in payload && payload.error
-				? payload.error
-				: "Failed to ship portfolio",
-		);
+	for (const allocation of allocations) {
+		const label = SLEEVE_LABELS[allocation.sleeve];
+		const result = await shipAquaStrategy({
+			walletClient,
+			allocation,
+			onStep: (message) => onStep?.(`${label}: ${message}`),
+		});
+		approvalHashes.push(...result.approvalHashes);
+		const events = decodeAquaShipEvents(result.shipped.receipt);
+		sleeves.push({
+			sleeve: result.shipped.sleeve,
+			txHash: result.shipped.hash,
+			strategyHash: strategyHashFromEvents(events),
+			strategy: result.shipped.strategy,
+			events,
+		});
 	}
 
-	return payload as ShipPortfolioResult;
+	return {
+		profile,
+		totalUsd: FIXED_SHIP_TOTAL_USD,
+		approvalHashes,
+		sleeves,
+	};
 }
