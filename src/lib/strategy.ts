@@ -1,4 +1,9 @@
-import { Address, AquaProtocolContract, type CallInfo } from "@1inch/aqua-sdk";
+import {
+	Address,
+	AquaProtocolContract,
+	type CallInfo,
+	HexString,
+} from "@1inch/aqua-sdk";
 import { AquaXYCAmmStrategy, MakerTraits, Order } from "@1inch/swap-vm-sdk";
 import {
 	type Address as EvmAddress,
@@ -222,3 +227,97 @@ export async function shipAquaPortfolio({
 		shipped,
 	};
 }
+
+export interface DockTarget {
+	sleeve: PairAllocation["sleeve"]
+	strategyHash: Hex
+	tokens: Address[] | string[]
+}
+
+export interface DockAquaStrategyInput {
+	walletClient: WalletClient
+	target: DockTarget
+	onStep?: (message: string) => void
+}
+
+export async function dockAquaStrategy({
+	walletClient,
+	target,
+	onStep,
+}: DockAquaStrategyInput): Promise<Hex> {
+	const account = walletClient.account
+	if (!account) throw new Error("walletClient account is required")
+
+	const aquaRegistry = new AquaProtocolContract(AQUA_CONTRACT)
+	const dockTx = aquaRegistry.dock({
+		app: SWAP_VM_ROUTER,
+		strategyHash: new HexString(target.strategyHash),
+		tokens: target.tokens.map((token) => new Address(token.toString())),
+	})
+
+	onStep?.(`Confirm docking ${target.sleeve} strategy in your wallet…`)
+	const hash = await walletClient.sendTransaction({
+		account,
+		chain: walletClient.chain,
+		to: dockTx.to as `0x${string}`,
+		data: dockTx.data as Hex,
+		value: dockTx.value,
+	})
+
+	await waitForTransactionReceipt(walletClient, { hash })
+	return hash
+}
+
+export interface UnshipInput {
+	walletClient: WalletClient
+	dockTargets: DockTarget[]
+	allocations: PairAllocation[]
+	onStep?: (message: string) => void
+}
+
+export interface UnshipResult {
+	dockHashes: Hex[]
+	approvalHashes: Hex[]
+	shipped: ShippedStrategy[]
+}
+
+/**
+ * Rebalance by docking existing Aqua strategies and shipping new target allocations.
+ */
+export async function unship({
+	walletClient,
+	dockTargets,
+	allocations,
+	onStep,
+}: UnshipInput): Promise<UnshipResult> {
+	const dockHashes: Hex[] = []
+	for (const target of dockTargets) {
+		onStep?.(`Docking ${target.sleeve} strategy…`)
+		const hash = await dockAquaStrategy({
+			walletClient,
+			target,
+			onStep,
+		})
+		dockHashes.push(hash)
+	}
+
+	const approvalHashes: Hex[] = []
+	const shipped: ShippedStrategy[] = []
+
+	for (const allocation of allocations) {
+		const result = await shipAquaStrategy({
+			walletClient,
+			allocation,
+			onStep,
+		})
+		approvalHashes.push(...result.approvalHashes)
+		shipped.push(result.shipped)
+	}
+
+	return {
+		dockHashes,
+		approvalHashes,
+		shipped,
+	}
+}
+

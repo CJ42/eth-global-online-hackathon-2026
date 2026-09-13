@@ -6,7 +6,10 @@
 
 .empty,
 .summary,
-.position {
+.position,
+.pricesCard,
+.rebalanceCard,
+.coverageCard {
 	border-radius: 1.25rem;
 	border-color: rgb(16 24 40 / 10%);
 	box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 6%);
@@ -27,6 +30,13 @@
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 1.25rem;
+}
+
+.positionHeader {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 0.5rem;
 }
 
 .amounts {
@@ -61,9 +71,298 @@
 	color: #101828;
 }
 
+/* Prices card & drift toggle */
+.pricesCard {
+	background: #ffffff;
+}
+
+.pricesHeaderRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.driftToggleWrap {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.driftToggleButton {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.875rem;
+	border-radius: 9999px;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	cursor: pointer;
+	border: 1px solid rgb(16 24 40 / 15%);
+	background: #f8fafc;
+	color: #334155;
+	transition: all 0.15s ease-in-out;
+}
+
+.driftToggleButton:hover {
+	background: #f1f5f9;
+}
+
+.driftToggleButtonActive {
+	background: #fef2f2;
+	border-color: #f87171;
+	color: #dc2626;
+}
+
+.pricesGrid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.875rem;
+	margin-top: 0.5rem;
+}
+
+.priceItem {
+	padding: 0.875rem 1rem;
+	border-radius: 0.75rem;
+	background: #f8fafc;
+	border: 1px solid rgb(16 24 40 / 6%);
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.priceItemDrifted {
+	background: #fef2f2;
+	border-color: #fca5a5;
+}
+
+.priceSymbol {
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #64748b;
+}
+
+.priceValue {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #0f172a;
+	font-variant-numeric: tabular-nums;
+}
+
+.priceTag {
+	font-size: 0.6875rem;
+	font-weight: 600;
+	color: #dc2626;
+}
+
+.pricesNote {
+	margin-top: 0.75rem;
+	font-size: 0.8125rem;
+	color: #64748b;
+	line-height: 1.4;
+}
+
+/* Drift Badges */
+.badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.2rem 0.55rem;
+	border-radius: 9999px;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.badgeOver {
+	background: #fee2e2;
+	color: #b91c1c;
+	border: 1px solid #fca5a5;
+}
+
+.badgeUnder {
+	background: #fef3c7;
+	color: #b45309;
+	border: 1px solid #fcd34d;
+}
+
+.badgeBalanced {
+	background: #dcfce7;
+	color: #15803d;
+	border: 1px solid #86efac;
+}
+
+/* Rebalance Card */
+.rebalanceCard {
+	background: #ffffff;
+}
+
+.rebalanceSummaryText {
+	font-size: 0.9375rem;
+	color: #334155;
+	margin-bottom: 1rem;
+}
+
+.rebalanceGrid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.875rem;
+	margin-bottom: 1.25rem;
+}
+
+.rebalanceTargetItem {
+	padding: 0.875rem 1rem;
+	border-radius: 0.75rem;
+	background: #f8fafc;
+	border: 1px solid rgb(16 24 40 / 8%);
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.rebalanceTargetLabel {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #64748b;
+}
+
+.rebalanceTargetValue {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #0f172a;
+}
+
+.rebalanceTargetShare {
+	font-size: 0.75rem;
+	color: #475467;
+}
+
+.rebalanceActions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.rebalanceBtn {
+	height: 3rem;
+	border-radius: 0.75rem;
+	font-weight: 600;
+	font-size: 0.9375rem;
+	background: #0f172a;
+	color: #ffffff;
+}
+
+.rebalanceBtn:hover:not(:disabled) {
+	background: #1e293b;
+}
+
+.stepBox {
+	padding: 0.75rem 1rem;
+	border-radius: 0.5rem;
+	background: #eff6ff;
+	border: 1px solid #bfdbfe;
+	color: #1d4ed8;
+	font-size: 0.875rem;
+}
+
+.errorBox {
+	padding: 0.75rem 1rem;
+	border-radius: 0.5rem;
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #b91c1c;
+	font-size: 0.875rem;
+}
+
+.successBox {
+	padding: 0.875rem 1rem;
+	border-radius: 0.5rem;
+	background: #f0fdf4;
+	border: 1px solid #bbf7d0;
+	color: #166534;
+	font-size: 0.875rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.successBox ul {
+	margin: 0;
+	padding-left: 1.25rem;
+	font-size: 0.8125rem;
+}
+
+.successBox code {
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 0.75rem;
+}
+
+/* Coverage Card */
+.coverageCard {
+	background: #ffffff;
+}
+
+.coverageTable {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+	margin-top: 0.5rem;
+}
+
+.coverageTable th {
+	text-align: left;
+	padding: 0.625rem 0.75rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #64748b;
+	border-bottom: 1px solid rgb(16 24 40 / 8%);
+}
+
+.coverageTable td {
+	padding: 0.75rem;
+	border-bottom: 1px solid rgb(16 24 40 / 5%);
+	color: #1e293b;
+	font-variant-numeric: tabular-nums;
+}
+
+.coverageStatusCovered {
+	display: inline-flex;
+	padding: 0.15rem 0.5rem;
+	border-radius: 9999px;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	background: #dcfce7;
+	color: #166534;
+	border: 1px solid #86efac;
+}
+
+.coverageStatusShortfall {
+	display: inline-flex;
+	padding: 0.15rem 0.5rem;
+	border-radius: 9999px;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	background: #fef3c7;
+	color: #92400e;
+	border: 1px solid #fde68a;
+}
+
+.coverageNote {
+	margin-top: 0.75rem;
+	font-size: 0.8125rem;
+	color: #64748b;
+	line-height: 1.4;
+}
+
 @media (max-width: 900px) {
-	.grid {
+	.grid,
+	.pricesGrid,
+	.rebalanceGrid {
 		grid-template-columns: 1fr;
-		max-width: 32rem;
 	}
 }
