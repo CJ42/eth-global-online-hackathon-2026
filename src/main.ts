@@ -4,7 +4,7 @@ import {
 	distributeInitialTokens,
 	logTokenBalances,
 	robinhoodForkClient,
-} from "./app/api/fork";
+} from "./lib/fork";
 import {
 	buildPortfolioAllocations,
 	FIXED_TOKEN_PRICES_USD,

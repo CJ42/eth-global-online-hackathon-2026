@@ -59,14 +59,16 @@ Maker wallet                    Aqua registry                 SwapVM router
 
 👨🏻‍💻 **Key code pointers:**
 - Ship + encoded strategy: [`src/lib/strategy.ts`](src/lib/strategy.ts), [`src/app/api/ship/route.ts`](src/app/api/ship/route.ts)
-- Taker fund: [`src/app/api/taker/fund/route.ts`](src/app/api/taker/fund/route.ts), [`src/app/api/fork.ts`](src/app/api/fork.ts)
+- Taker fund: [`src/lib/fork.ts`](src/lib/fork.ts) (browser calls the local Anvil `anvil_*` JSON-RPC directly, no backend)
+
+<!-- TODO: add diagram flow to explain the dock and rebalancing -->
 
 ### Trader flow
 
 After connecting its wallet to the app and using the Robinhood anvil fork network (chain ID `1337`, RPC `http://localhost:8545`), a taker can go to the page **For Traders** to perform a swap.
 
 1. The trader click on the button to **swap 10 USDG**:
-   - backend funds the connected address with gas + 10 USDG (`POST /api/taker/fund`)
+   - the browser funds the connected address with gas + 10 USDG directly on the local Anvil fork (whale impersonation via `anvil_*` JSON-RPC — works from the hosted demo too, since it is your browser talking to `localhost:8545`)
    - MetaMask signs USDG approve → AquaSwapVMRouter
    - MetaMask signs SwapVM `swap()` against the low-risk USDG/WETH strategy
 2. UI shows swap tx hash, `Swapped` / `Pulled` / `Pushed`, and ERC-20 `Transfer` evidence.

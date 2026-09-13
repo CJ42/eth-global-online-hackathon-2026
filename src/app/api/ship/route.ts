@@ -14,7 +14,7 @@ import {
 	strategyHashFromEvents,
 } from "@/lib/ship";
 import { shipAquaPortfolio } from "@/lib/strategy";
-import { fundMakerInventory, robinhoodForkClient } from "../fork";
+import { fundMakerInventory, robinhoodForkClient } from "@/lib/fork";
 
 export async function POST(request: Request) {
 	try {

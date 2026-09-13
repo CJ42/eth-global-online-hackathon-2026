@@ -1,5 +1,6 @@
 import type { Address, Hex } from "viem";
-import type { FaucetAmounts } from "@/config";
+import { type FaucetAmounts, LOCAL_FORK_RPC_URL } from "@/config";
+import { fundTakerForSwap } from "@/lib/fork";
 
 export type FundTakerResult = {
 	address: Address;
@@ -13,42 +14,29 @@ export type FundTakerResult = {
 	};
 };
 
-export type FaucetResult = {
-	address: Address;
-	amountWei: string;
-};
-
-async function postJson<T>(url: string, body: unknown, fallbackError: string) {
-	const response = await fetch(url, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(body),
-	});
-
-	const payload = await response.json();
-
-	if (!response.ok) {
-		const message = (payload as { error?: string }).error;
-		throw new Error(message || fallbackError);
-	}
-
-	return payload as T;
-}
-
+/**
+ * Fund the connected wallet straight from the browser: the Anvil fork accepts
+ * unauthenticated anvil_* JSON-RPC, so no backend is needed.
+ */
 export async function fundTaker(address: Address): Promise<FundTakerResult> {
-	return postJson<FundTakerResult>(
-		"/api/taker/fund",
-		{ address },
-		"Failed to fund taker",
-	);
-}
+	try {
+		const funded = await fundTakerForSwap(address);
+		return { address, ...funded };
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
 
-export async function requestFaucet(address: Address): Promise<FaucetResult> {
-	return postJson<FaucetResult>(
-		"/api/faucet",
-		{ address },
-		"Failed to request faucet ETH",
-	);
+		const isRpcFailure =
+			message.includes("fetch failed") ||
+			message.includes("Failed to fetch") ||
+			message.includes("ECONNREFUSED") ||
+			message.includes("HTTP request failed") ||
+			message.includes("metadata is not found");
+
+		if (isRpcFailure)
+			throw new Error(
+				`Cannot reach a healthy Robinhood Anvil fork at ${LOCAL_FORK_RPC_URL}. Start it with \`bun run chain:start\`.`,
+			);
+
+		throw error;
+	}
 }

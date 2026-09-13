@@ -13,7 +13,7 @@
 import { writeFileSync } from "node:fs";
 import { hexToBytes, parseEther } from "viem";
 
-import { fundMakerInventory, robinhoodForkClient } from "../app/api/fork";
+import { fundMakerInventory, robinhoodForkClient } from "../lib/fork";
 import { LOCAL_FORK_RPC_URL, maker } from "../config";
 import {
 	buildPortfolioAllocations,
