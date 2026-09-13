@@ -2,6 +2,7 @@ import {
 	type Account,
 	type Address,
 	erc20Abi,
+	formatUnits,
 	type Hex,
 	type WalletClient,
 } from "viem";
@@ -11,6 +12,19 @@ const PRICE_SCALE = 1_000_000_000;
 
 export function getTokenDecimals(symbol?: string): number {
 	return symbol === "USDG" ? 6 : 18;
+}
+
+export function tokenAmountToUsd({
+	amount,
+	priceUsd,
+	symbol,
+}: {
+	amount: bigint;
+	priceUsd: number;
+	symbol: string;
+}): number {
+	const decimals = getTokenDecimals(symbol);
+	return Number(formatUnits(amount, decimals)) * priceUsd;
 }
 
 export function usdToTokenAmount({

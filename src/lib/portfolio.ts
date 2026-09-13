@@ -1,5 +1,5 @@
 import { TOKENIZED_STOCKS, TOKENS } from "@/constants";
-import { usdToTokenAmount } from "./tokens";
+import { tokenAmountToUsd, usdToTokenAmount } from "./tokens";
 
 export type RiskProfile = "conservative" | "balanced" | "aggressive";
 
@@ -66,7 +66,99 @@ export const FIXED_TOKEN_PRICES_USD = {
 	WETH: 2500,
 	ONEINCH: 0.1,
 	TSLA: 350,
-} as const satisfies TokenPricesUsd;
+} as const satisfies TokenPricesUsd
+
+export const DRIFTED_TOKEN_PRICES_USD = {
+	USDG: 1,
+	WETH: 2500,
+	ONEINCH: 0.1,
+	TSLA: 1225,
+} as const satisfies TokenPricesUsd
+
+export const REBALANCE_BAND = 0.05
+
+export interface SleeveDrift {
+	sleeve: SleeveId
+	currentUsd: number
+	currentShare: number
+	targetShare: number
+	drift: number
+	isOutsideBand: boolean
+}
+
+export interface PortfolioDriftResult {
+	totalCurrentUsd: number
+	sleeves: Record<SleeveId, SleeveDrift>
+	maxDrift: number
+	needsRebalance: boolean
+}
+
+export interface ComputeSleeveDriftInput {
+	allocations: PairAllocation[]
+	prices: TokenPricesUsd
+	weights: SleeveWeights
+}
+
+export function computeSleeveDrift({
+	allocations,
+	prices,
+	weights,
+}: ComputeSleeveDriftInput): PortfolioDriftResult {
+	const sleeveValues = allocations.map((allocation) => {
+		const currentUsd = allocation.legs.reduce((sum, leg) => {
+			const price = prices[leg.token.symbol as keyof TokenPricesUsd] ?? 0
+			return (
+				sum +
+				tokenAmountToUsd({
+					amount: leg.amount,
+					priceUsd: price,
+					symbol: leg.token.symbol,
+				})
+			)
+		}, 0)
+
+		return {
+			sleeve: allocation.sleeve,
+			currentUsd,
+		}
+	})
+
+	const totalCurrentUsd = sleeveValues.reduce(
+		(sum, item) => sum + item.currentUsd,
+		0,
+	)
+
+	const sleeves = {} as Record<SleeveId, SleeveDrift>
+	let maxDrift = 0
+	let needsRebalance = false
+
+	for (const { sleeve, currentUsd } of sleeveValues) {
+		const targetShare = weights[sleeve]
+		const currentShare = totalCurrentUsd > 0 ? currentUsd / totalCurrentUsd : 0
+		const drift = currentShare - targetShare
+		const absDrift = Math.abs(drift)
+		const isOutsideBand = absDrift > REBALANCE_BAND
+
+		if (absDrift > maxDrift) maxDrift = absDrift
+		if (isOutsideBand) needsRebalance = true
+
+		sleeves[sleeve] = {
+			sleeve,
+			currentUsd,
+			currentShare,
+			targetShare,
+			drift,
+			isOutsideBand,
+		}
+	}
+
+	return {
+		totalCurrentUsd,
+		sleeves,
+		maxDrift,
+		needsRebalance,
+	}
+}
 
 const WEIGHT_TOLERANCE = 1e-9;
 

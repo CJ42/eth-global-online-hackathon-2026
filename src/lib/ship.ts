@@ -2,7 +2,7 @@ import { ABI } from "@1inch/aqua-sdk";
 import type { Address, Hex, Log, TransactionReceipt } from "viem";
 import { formatUnits, getAddress, parseEventLogs } from "viem";
 import { TOKEN_ADDRESS_BY_SYMBOL } from "@/constants";
-import type { RiskProfile, SleeveId } from "./portfolio";
+import type { RiskProfile, SleeveId, TokenPricesUsd } from "./portfolio";
 import { getTokenDecimals } from "./tokens";
 
 const DISPLAY_SYMBOL: Record<string, string> = {
@@ -52,12 +52,14 @@ export type ShippedSleeveResult = {
 	events: AquaShipEvent[];
 };
 
-export type ShipPortfolioResult = {
+export interface ShipPortfolioResult {
 	profile: RiskProfile;
 	totalUsd: number;
 	approvalHashes: Hex[];
 	sleeves: ShippedSleeveResult[];
-};
+	dockHashes?: Hex[];
+	prices?: TokenPricesUsd;
+}
 
 export type ShipPortfolioRequest = {
 	profile: RiskProfile;
