@@ -53,6 +53,7 @@ export type ShippedSleeveResult = {
 };
 
 export interface ShipPortfolioResult {
+	maker: Address;
 	profile: RiskProfile;
 	totalUsd: number;
 	approvalHashes: Hex[];

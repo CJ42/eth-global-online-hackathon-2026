@@ -87,6 +87,10 @@ After connecting its wallet to the app and using the Robinhood anvil fork networ
 - RPC: `http://localhost:8545`
 - Chain ID: `1337`
 
+[`robinhood-fork-snapshot.json`](https://github.com/CJ42/1inch-aqua-funds-manager/blob/main/robinhood-fork-snapshot.json) is a frozen Anvil state dump of a Robinhood mainnet fork (Aqua registry, SwapVM router, USDG / WETH / 1INCH / TSLA, and whale balances). `chain:start` loads it with `--load-state`, so Anvil runs standalone and does not need the public Robinhood RPC.
+
+If you are using the hosted demo (not a git clone), download that JSON into the folder where you start Anvil, then run:
+
 ```bash
 bun run chain:start
 ```
@@ -109,6 +113,16 @@ bun run chain:snapshot   # terminal 2: warms the demo flow, writes robinhood-for
 ```
 
 Then stop `chain:fork` and use `chain:start`.
+
+<!-- ### Pointing the hosted demo at a public Anvil endpoint
+
+The fork RPC URL defaults to `http://localhost:8545` and can be overridden at build time with `NEXT_PUBLIC_FORK_RPC_URL`. The deployed Cloudflare Worker cannot reach `localhost`, so the live site must be built with the public URL of a hosted Anvil node (e.g. a VPS behind a Cloudflare tunnel):
+
+```bash
+NEXT_PUBLIC_FORK_RPC_URL=https://<your-anvil-tunnel-domain> bun run app:deploy
+```
+
+Without this variable the deployed API routes (`/api/faucet`, `/api/ship`, `/api/taker/fund`) fail with "Cannot reach a healthy Robinhood Anvil fork". Local development needs no variable. -->
 
 ---
 

@@ -1,5 +1,5 @@
 import { parseEther } from "viem";
-import { maker } from "@/config";
+import { LOCAL_FORK_RPC_URL, maker } from "@/config";
 import {
 	buildPortfolioAllocations,
 	FIXED_TOKEN_PRICES_USD,
@@ -55,6 +55,7 @@ export async function POST(request: Request) {
 		}
 
 		const result: ShipPortfolioResult = {
+			maker,
 			profile,
 			totalUsd: FIXED_SHIP_TOTAL_USD,
 			approvalHashes: shipResult.approvalHashes,
@@ -80,7 +81,7 @@ export async function POST(request: Request) {
 		return Response.json(
 			{
 				error: isRpcFailure
-					? "Cannot reach a healthy local Robinhood Anvil fork at 127.0.0.1:8545. Restart with `bun run chain:start`."
+					? `Cannot reach a healthy Robinhood Anvil fork at ${LOCAL_FORK_RPC_URL}. Restart it with \`bun run chain:start\`.`
 					: message,
 			},
 			{ status: isRpcFailure ? 503 : status },

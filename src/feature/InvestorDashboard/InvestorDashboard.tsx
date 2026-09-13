@@ -46,8 +46,8 @@ const TRACKED_TOKENS = [
 ] as const
 
 export function InvestorDashboard() {
-	const { result, isReady, setResult } = useShippedPortfolio()
 	const { address, connect, isConnecting } = useWallet()
+	const { result, isReady, setResult } = useShippedPortfolio(address)
 
 	const [isDriftSimulated, setIsDriftSimulated] = useState(false)
 	const [isRebalancing, setIsRebalancing] = useState(false)
@@ -166,13 +166,37 @@ export function InvestorDashboard() {
 
 	if (!isReady) return null
 
+	if (!address) {
+		return (
+			<Card className={styles.empty}>
+				<CardHeader>
+					<CardTitle>Connect your wallet</CardTitle>
+					<CardDescription>
+						Positions are shown for the connected maker address only.
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<Button
+						type="button"
+						className={styles.cta}
+						disabled={isConnecting}
+						onClick={() => void connect()}
+					>
+						{isConnecting ? "Connecting…" : "Connect wallet"}
+					</Button>
+				</CardContent>
+			</Card>
+		);
+	}
+
 	if (!result) {
 		return (
 			<Card className={styles.empty}>
 				<CardHeader>
 					<CardTitle>No positions yet</CardTitle>
 					<CardDescription>
-						Deploy a strategy on Home. Your sleeve amounts will show up here.
+						Deploy a strategy on Home with this wallet. Your sleeve amounts will
+						show up here.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -229,7 +253,7 @@ export function InvestorDashboard() {
 				<CardHeader>
 					<CardTitle>{strategy.name} portfolio</CardTitle>
 					<CardDescription>
-						${driftResult.totalCurrentUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })} current portfolio valuation across three Aqua XYC strategies (deployed with ${result.totalUsd.toLocaleString()} initial USD).
+						${driftResult.totalCurrentUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })} current portfolio valuation across three Aqua XYC strategies for {shortenAddress(address)} (deployed with ${result.totalUsd.toLocaleString()} initial USD).
 					</CardDescription>
 				</CardHeader>
 			</Card>

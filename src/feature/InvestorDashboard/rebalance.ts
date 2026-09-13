@@ -115,6 +115,7 @@ export async function rebalancePortfolio({
 	)
 
 	const updatedResult: ShipPortfolioResult = {
+		maker: address,
 		profile: currentResult.profile,
 		totalUsd: newTotalUsd,
 		approvalHashes: unshipResult.approvalHashes,

@@ -71,6 +71,7 @@ export async function shipPortfolio(
 	}
 
 	return {
+		maker: address,
 		profile,
 		totalUsd: FIXED_SHIP_TOTAL_USD,
 		approvalHashes,

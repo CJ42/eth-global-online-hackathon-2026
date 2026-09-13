@@ -3,7 +3,10 @@ import { AQUA_SWAP_VM_CONTRACT_ADDRESSES } from "@1inch/swap-vm-sdk";
 import { defineChain } from "viem";
 import { robinhood } from "viem/chains";
 
-export const LOCAL_FORK_RPC_URL = "http://localhost:8545";
+// Overridable at build time so the deployed worker + UI can target a public
+// Anvil endpoint (e.g. the VPS behind a Cloudflare tunnel) instead of localhost.
+export const LOCAL_FORK_RPC_URL =
+	process.env.NEXT_PUBLIC_FORK_RPC_URL ?? "http://localhost:8545";
 export const FORK_CHAIN_ID = 1337;
 
 export const robinhoodFork = defineChain({
